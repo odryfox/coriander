@@ -7,3 +7,21 @@ module = "coriander"
 author = "Vyacheslav Rusov"
 author-email = "odryfox@gmail.com"
 home-page = "https://github.com/odryfox/coriander"
+classifiers = [
+    "Programming Language :: Python",
+]
+description-file = "README.md"
+requires-python = ">=2.7"
+
+[tool.flit.metadata.requires-extra]
+test = [
+    "pytest ==6.2.3",
+    "pytest-cov ==2.11.1",
+    "mypy ==0.812",
+    "flake8 >=3.9.1,<4.0.0",
+    "black ==21.5b0",
+    "isort >=5.8.0,<6.0.0",
+]
+dev = [
+    "isort >=5.8.0,<6.0.0",
+]
