@@ -8,10 +8,10 @@ author = "Vyacheslav Rusov"
 author-email = "odryfox@gmail.com"
 home-page = "https://github.com/odryfox/coriander"
 classifiers = [
-    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
 ]
 description-file = "README.md"
-requires-python = ">=2.7"
+requires-python = ">=3.6"
 
 [tool.flit.metadata.requires-extra]
 test = [
