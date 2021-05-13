@@ -25,3 +25,6 @@ test = [
 dev = [
     "isort >=5.8.0,<6.0.0",
 ]
+
+[tool.isort]
+profile = "black"
