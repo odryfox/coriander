@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, List, Optional
 
 from coriander.core import BaseToken, BaseTokenFinder, BaseTokenizer, TokenFindResult
 
@@ -6,6 +6,16 @@ from coriander.core import BaseToken, BaseTokenFinder, BaseTokenizer, TokenFindR
 class AnyToken(BaseToken):
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__)
+
+    def match(
+        self,
+        message: str,
+    ) -> List[int]:
+        """
+        >>> AnyToken().match("hello")
+        [1, 2, 3, 4, 5]
+        """
+        return list(range(1, len(message) + 1))
 
 
 class AnyTokenFinder(BaseTokenFinder):
@@ -26,6 +36,20 @@ class CharToken(BaseToken):
 
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__) and other.char == self.char
+
+    def match(
+        self,
+        message: str,
+    ) -> List[int]:
+        """
+        >>> CharToken(value="h").match("hello")
+        [1]
+        >>> CharToken(value="e").match("hello")
+        []
+        """
+        if message[0] == self.char:
+            return [1]
+        return []
 
 
 class CharTokenFinder(BaseTokenFinder):

@@ -3,7 +3,12 @@ from typing import List, Optional
 
 
 class BaseToken(ABC):
-    pass
+    @abstractmethod
+    def match(
+        self,
+        message: str,
+    ) -> List[int]:
+        """Match token with start of message. Return variants ending of token."""
 
 
 class BaseTokenizer(ABC):
@@ -26,3 +31,13 @@ class BaseTokenFinder(ABC):
         tokenizer: BaseTokenizer,
     ) -> Optional[TokenFindResult]:
         """Find token in start of raw_template."""
+
+
+class BaseMatcher(ABC):
+    @abstractmethod
+    def match(
+        self,
+        message: str,
+        tokens: List[BaseToken],
+    ) -> bool:
+        """Match message and tokens."""
