@@ -1,3 +1,5 @@
+import random
+import string
 from typing import Any, List, Optional
 
 from coriander.core import (
@@ -21,6 +23,13 @@ class AnyToken(BaseToken):
         [1, 2, 3, 4, 5]
         """
         return list(range(1, len(message) + 1))
+
+    def generate_message(
+        self,
+    ) -> str:
+        n = random.randint(1, 10)
+        alphabet = string.ascii_uppercase + string.digits
+        return "".join(random.choice(alphabet) for _ in range(n))
 
 
 class AnyTokenInTemplateFinder(BaseTokenInTemplateFinder):
@@ -55,6 +64,11 @@ class CharToken(BaseToken):
         if message[0] == self.char:
             return [1]
         return []
+
+    def generate_message(
+        self,
+    ) -> str:
+        return self.char
 
 
 class CharTokenInTemplateFinder(BaseTokenInTemplateFinder):

@@ -85,3 +85,13 @@ def test_default_tokenizer():
         CharToken(char="o"),
     ]
     assert actual_tokens == expected_tokens
+
+
+def test_generate_any_token():
+    message = AnyToken().generate_message()
+    assert message
+
+
+def test_generate_char_token():
+    message = CharToken(char="h").generate_message()
+    assert message == "h"

@@ -20,6 +20,10 @@ class BaseToken(ABC):
     ) -> List[int]:
         """Match token with start of message. Return variants ending of token."""
 
+    @abstractmethod
+    def generate_message(self) -> str:
+        """Generate message."""
+
 
 class BaseMessageWithTokensMatcher(ABC):
     @abstractmethod
@@ -51,3 +55,12 @@ class BaseTokenInTemplateFinder(ABC):
         template_tokenizer: BaseTemplateTokenizer,
     ) -> Optional[FindTokenInTemplateResult]:
         """Find token in start of template."""
+
+
+class BaseMessageFromTemplateGenerator(ABC):
+    @abstractmethod
+    def generate_message_from_template(
+        self,
+        template: str,
+    ) -> str:
+        """Generate message from template."""
