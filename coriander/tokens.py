@@ -1,32 +1,37 @@
 from typing import Any, List, Optional
 
-from coriander.core import BaseToken, BaseTokenFinder, BaseTokenizer, TokenFindResult
+from coriander.core import (
+    BaseTemplateTokenizer,
+    BaseToken,
+    BaseTokenInTemplateFinder,
+    FindTokenInTemplateResult,
+)
 
 
 class AnyToken(BaseToken):
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__)
 
-    def match(
+    def match_with_message(
         self,
         message: str,
     ) -> List[int]:
         """
-        >>> AnyToken().match("hello")
+        >>> AnyToken().match_with_message("hello")
         [1, 2, 3, 4, 5]
         """
         return list(range(1, len(message) + 1))
 
 
-class AnyTokenFinder(BaseTokenFinder):
-    def find(
+class AnyTokenInTemplateFinder(BaseTokenInTemplateFinder):
+    def find_token_in_template(
         self,
-        raw_template: str,
-        tokenizer: BaseTokenizer,
-    ) -> Optional[TokenFindResult]:
-        if raw_template[0] == "*":
+        template: str,
+        template_tokenizer: BaseTemplateTokenizer,
+    ) -> Optional[FindTokenInTemplateResult]:
+        if template[0] == "*":
             token = AnyToken()
-            return TokenFindResult(token=token, end=1)
+            return FindTokenInTemplateResult(token=token, end=1)
         return None
 
 
@@ -37,14 +42,14 @@ class CharToken(BaseToken):
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__) and other.char == self.char
 
-    def match(
+    def match_with_message(
         self,
         message: str,
     ) -> List[int]:
         """
-        >>> CharToken(value="h").match("hello")
+        >>> CharToken(value="h").match_with_message("hello")
         [1]
-        >>> CharToken(value="e").match("hello")
+        >>> CharToken(value="e").match_with_message("hello")
         []
         """
         if message[0] == self.char:
@@ -52,11 +57,11 @@ class CharToken(BaseToken):
         return []
 
 
-class CharTokenFinder(BaseTokenFinder):
-    def find(
+class CharTokenInTemplateFinder(BaseTokenInTemplateFinder):
+    def find_token_in_template(
         self,
-        raw_template: str,
-        tokenizer: BaseTokenizer,
-    ) -> Optional[TokenFindResult]:
-        token = CharToken(char=raw_template[0])
-        return TokenFindResult(token=token, end=1)
+        template: str,
+        template_tokenizer: BaseTemplateTokenizer,
+    ) -> Optional[FindTokenInTemplateResult]:
+        token = CharToken(char=template[0])
+        return FindTokenInTemplateResult(token=token, end=1)

@@ -1,35 +1,38 @@
 from typing import Iterable, List
 
-from coriander.core import BaseToken, BaseTokenFinder, BaseTokenizer
-from coriander.tokens import AnyTokenFinder, CharTokenFinder
+from coriander.core import BaseTemplateTokenizer, BaseToken, BaseTokenInTemplateFinder
+from coriander.tokens import AnyTokenInTemplateFinder, CharTokenInTemplateFinder
 
 
-class Tokenizer(BaseTokenizer):
-    def __init__(self, token_finders: Iterable[BaseTokenFinder]) -> None:
-        self.token_finders = token_finders
+class TemplateTokenizer(BaseTemplateTokenizer):
+    def __init__(
+        self,
+        token_in_template_finders: Iterable[BaseTokenInTemplateFinder],
+    ) -> None:
+        self.token_in_template_finders = token_in_template_finders
 
-    def tokenize(self, raw_template: str) -> List[BaseToken]:
+    def template_tokenize(self, template: str) -> List[BaseToken]:
         tokens = []
 
-        while raw_template:
-            for token_finder in self.token_finders:
-                token_find_result = token_finder.find(
-                    raw_template=raw_template,
-                    tokenizer=self,
+        while template:
+            for token_in_template_finder in self.token_in_template_finders:
+                find_result = token_in_template_finder.find_token_in_template(
+                    template=template,
+                    template_tokenizer=self,
                 )
-                if token_find_result:
-                    tokens.append(token_find_result.token)
-                    end = token_find_result.end
-                    raw_template = raw_template[end:]
+                if find_result:
+                    tokens.append(find_result.token)
+                    end = find_result.end
+                    template = template[end:]
 
         return tokens
 
 
-class DefaultTokenizer(Tokenizer):
+class DefaultTokenizer(TemplateTokenizer):
     def __init__(self) -> None:
-        token_finders = [
-            AnyTokenFinder(),
-            CharTokenFinder(),
+        token_in_template_finders = [
+            AnyTokenInTemplateFinder(),
+            CharTokenInTemplateFinder(),
         ]
 
-        super().__init__(token_finders=token_finders)
+        super().__init__(token_in_template_finders=token_in_template_finders)
