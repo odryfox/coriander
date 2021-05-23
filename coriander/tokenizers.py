@@ -1,7 +1,11 @@
 from typing import Iterable, List
 
 from coriander.core import BaseTemplateTokenizer, BaseToken, BaseTokenInTemplateFinder
-from coriander.tokens import AnyTokenInTemplateFinder, CharTokenInTemplateFinder
+from coriander.tokens import (
+    AnyTokenInTemplateFinder,
+    CharTokenInTemplateFinder,
+    OptionalTokenInTemplateFinder,
+)
 
 
 class TemplateTokenizer(BaseTemplateTokenizer):
@@ -32,6 +36,7 @@ class DefaultTokenizer(TemplateTokenizer):
     def __init__(self) -> None:
         token_in_template_finders = [
             AnyTokenInTemplateFinder(),
+            OptionalTokenInTemplateFinder(),
             CharTokenInTemplateFinder(),
         ]
 
