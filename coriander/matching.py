@@ -17,6 +17,7 @@ class TokensWithMessageMatcher(BaseTokensWithMessageMatcher):
 
         current_token_ending_variants = tokens[0].match_with_message(
             message=message,
+            tokens_with_message_matcher=self,
         )
 
         token_ending_variants_set = set()

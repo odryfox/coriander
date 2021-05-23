@@ -17,6 +17,7 @@ class BaseToken(ABC):
     def match_with_message(
         self,
         message: str,
+        tokens_with_message_matcher: "BaseTokensWithMessageMatcher",
     ) -> List[int]:
         """Match token with start of message. Return variants ending of token."""
 

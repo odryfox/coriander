@@ -1,3 +1,4 @@
+from coriander.matching import TokensWithMessageMatcher
 from coriander.tokenizers import DefaultTokenizer, TemplateTokenizer
 from coriander.tokens import (
     AnyToken,
@@ -107,3 +108,36 @@ def test_generate_any_token():
 def test_generate_char_token():
     message = CharToken(char="h").generate_message()
     assert message == "h"
+
+
+def test_any_token_match_with_message():
+    token = AnyToken()
+
+    token_ending_variants = token.match_with_message(
+        message="hello",
+        tokens_with_message_matcher=TokensWithMessageMatcher(),
+    )
+
+    assert token_ending_variants == [1, 2, 3, 4, 5]
+
+
+def test_char_token_match_with_message():
+    token = CharToken(char="h")
+
+    token_ending_variants = token.match_with_message(
+        message="hello",
+        tokens_with_message_matcher=TokensWithMessageMatcher(),
+    )
+
+    assert token_ending_variants == [1]
+
+
+def test_char_token_match_with_message_incorrect():
+    token = CharToken(char="a")
+
+    token_ending_variants = token.match_with_message(
+        message="hello",
+        tokens_with_message_matcher=TokensWithMessageMatcher(),
+    )
+
+    assert token_ending_variants == []

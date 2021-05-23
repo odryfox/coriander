@@ -6,6 +6,7 @@ from coriander.core import (
     BaseTemplateTokenizer,
     BaseToken,
     BaseTokenInTemplateFinder,
+    BaseTokensWithMessageMatcher,
     FindTokenInTemplateResult,
 )
 
@@ -20,11 +21,8 @@ class AnyToken(BaseToken):
     def match_with_message(
         self,
         message: str,
+        tokens_with_message_matcher: BaseTokensWithMessageMatcher,
     ) -> List[int]:
-        """
-        >>> AnyToken().match_with_message("hello")
-        [1, 2, 3, 4, 5]
-        """
         return list(range(1, len(message) + 1))
 
     def generate_message(
@@ -60,13 +58,8 @@ class CharToken(BaseToken):
     def match_with_message(
         self,
         message: str,
+        tokens_with_message_matcher: BaseTokensWithMessageMatcher,
     ) -> List[int]:
-        """
-        >>> CharToken(value="h").match_with_message("hello")
-        [1]
-        >>> CharToken(value="e").match_with_message("hello")
-        []
-        """
         if message[0] == self.char:
             return [1]
         return []
