@@ -7,6 +7,18 @@ from coriander.tokens import (
 )
 
 
+def test_any_token_repr():
+    token = AnyToken()
+
+    assert repr(token) == "AnyToken()"
+
+
+def test_char_token_repr():
+    token = CharToken(char="a")
+
+    assert repr(token) == "CharToken(char='a')"
+
+
 def test_char_token():
     template_tokenizer = TemplateTokenizer(token_in_template_finders=[])
     token_in_template_finder = CharTokenInTemplateFinder()

@@ -11,6 +11,9 @@ from coriander.core import (
 
 
 class AnyToken(BaseToken):
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}()"
+
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__)
 
@@ -47,6 +50,9 @@ class AnyTokenInTemplateFinder(BaseTokenInTemplateFinder):
 class CharToken(BaseToken):
     def __init__(self, char: str) -> None:
         self.char = char
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(char={repr(self.char)})"
 
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__) and other.char == self.char
