@@ -1,4 +1,4 @@
-from coriander.matching import MessageWithTokensMatcher
+from coriander.matching import TokensWithMessageMatcher
 from coriander.tokens import AnyToken, CharToken
 
 
@@ -9,11 +9,11 @@ def test_correct_message():
         AnyToken(),
         CharToken(char="o"),
     ]
-    match_result = MessageWithTokensMatcher().match_message_with_tokens(
-        message="hello",
+    tokens_ending_variants = TokensWithMessageMatcher().match_tokens_with_message(
         tokens=tokens,
+        message="hello",
     )
-    assert match_result
+    assert tokens_ending_variants == [5]
 
 
 def test_incorrect_message():
@@ -23,40 +23,63 @@ def test_incorrect_message():
         AnyToken(),
         CharToken(char="a"),
     ]
-    match_result = MessageWithTokensMatcher().match_message_with_tokens(
-        message="hello",
+    tokens_ending_variants = TokensWithMessageMatcher().match_tokens_with_message(
         tokens=tokens,
+        message="hello",
     )
-    assert not match_result
+    assert tokens_ending_variants == []
 
 
-def test_empty_message_and_non_empty_tokens():
+def test_tokens_and_empty_message():
     tokens = [
         CharToken(char="h"),
         CharToken(char="e"),
         AnyToken(),
         CharToken(char="o"),
     ]
-    match_result = MessageWithTokensMatcher().match_message_with_tokens(
-        message="",
+    tokens_ending_variants = TokensWithMessageMatcher().match_tokens_with_message(
         tokens=tokens,
-    )
-    assert not match_result
-
-
-def test_empty_message_and_empty_tokens():
-    tokens = []
-    match_result = MessageWithTokensMatcher().match_message_with_tokens(
         message="",
-        tokens=tokens,
     )
-    assert match_result
+    assert tokens_ending_variants == []
 
 
-def test_message_and_tokens():
+def test_empty_tokens_and_empty_message():
     tokens = []
-    match_result = MessageWithTokensMatcher().match_message_with_tokens(
+    tokens_ending_variants = TokensWithMessageMatcher().match_tokens_with_message(
+        tokens=tokens,
+        message="",
+    )
+    assert tokens_ending_variants == [0]
+
+
+def test_empty_tokens_and_message():
+    tokens = []
+    tokens_ending_variants = TokensWithMessageMatcher().match_tokens_with_message(
+        tokens=tokens,
         message="hello",
-        tokens=tokens,
     )
-    assert not match_result
+    assert tokens_ending_variants == [0]
+
+
+def test_any_variants():
+    tokens = [
+        AnyToken(),
+        CharToken(char="e"),
+    ]
+    tokens_ending_variants = TokensWithMessageMatcher().match_tokens_with_message(
+        tokens=tokens,
+        message="hee",
+    )
+    assert tokens_ending_variants == [2, 3]
+
+
+def test_any_token():
+    tokens = [
+        AnyToken(),
+    ]
+    tokens_ending_variants = TokensWithMessageMatcher().match_tokens_with_message(
+        tokens=tokens,
+        message="hee",
+    )
+    assert tokens_ending_variants == [1, 2, 3]

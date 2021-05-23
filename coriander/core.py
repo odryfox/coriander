@@ -25,14 +25,14 @@ class BaseToken(ABC):
         """Generate message."""
 
 
-class BaseMessageWithTokensMatcher(ABC):
+class BaseTokensWithMessageMatcher(ABC):
     @abstractmethod
-    def match_message_with_tokens(
+    def match_tokens_with_message(
         self,
-        message: str,
         tokens: List[BaseToken],
-    ) -> bool:
-        """Match message and tokens."""
+        message: str,
+    ) -> List[int]:
+        """Match tokens with start of message. Return variants ending of tokens."""
 
 
 class BaseTemplateTokenizer(ABC):

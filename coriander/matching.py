@@ -1,32 +1,34 @@
 from typing import List
 
-from coriander.core import BaseMessageWithTokensMatcher, BaseToken
+from coriander.core import BaseToken, BaseTokensWithMessageMatcher
 
 
-class MessageWithTokensMatcher(BaseMessageWithTokensMatcher):
-    def match_message_with_tokens(
+class TokensWithMessageMatcher(BaseTokensWithMessageMatcher):
+    def match_tokens_with_message(
         self,
-        message: str,
         tokens: List[BaseToken],
-    ) -> bool:
+        message: str,
+    ) -> List[int]:
         if not tokens:
-            return not message
+            return [0]
 
         if not message:
-            return not tokens
+            return []
 
-        token = tokens[0]
+        current_token_ending_variants = tokens[0].match_with_message(
+            message=message,
+        )
 
-        token_ending_variants = token.match_with_message(message)
-        if not token_ending_variants:
-            return False
+        token_ending_variants_set = set()
 
-        for token_ending_variant in token_ending_variants:
-            result = self.match_message_with_tokens(
-                message=message[token_ending_variant:],
+        for current_token_ending_variant in current_token_ending_variants:
+            other_tokens_ending_variants = self.match_tokens_with_message(
                 tokens=tokens[1:],
+                message=message[current_token_ending_variant:],
             )
-            if result:
-                return True
+            for other_tokens_ending_variant in other_tokens_ending_variants:
+                token_ending_variants_set.add(
+                    other_tokens_ending_variant + current_token_ending_variant
+                )
 
-        return False
+        return list(sorted(token_ending_variants_set))

@@ -3,4 +3,4 @@
 set -e
 set -x
 
-pytest --cov=coriander tests
+pytest --cov=coriander tests --cov-report term-missing
