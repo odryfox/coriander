@@ -7,6 +7,8 @@ from coriander.tokens import (
     AnyTokenInTemplateFinder,
     CharToken,
     CharTokenInTemplateFinder,
+    ChoiceToken,
+    ChoiceTokenInTemplateFinder,
     OptionalToken,
     OptionalTokenInTemplateFinder,
 )
@@ -28,6 +30,20 @@ def test_optional_token_repr():
     token = OptionalToken(tokens=[AnyToken(), CharToken(char="a")])
 
     assert repr(token) == "OptionalToken(tokens=[AnyToken(), CharToken(char='a')])"
+
+
+def test_choice_token_repr():
+    token = ChoiceToken(
+        choices=[
+            [AnyToken(), CharToken(char="a")],
+            [CharToken(char="b")],
+        ]
+    )
+
+    assert (
+        repr(token) == "ChoiceToken(choices=[[AnyToken(), CharToken(char='a')], "
+        "[CharToken(char='b')]])"
+    )
 
 
 def test_char_token():
@@ -254,3 +270,191 @@ def test_optional_token_match_with_message():
     )
 
     assert token_ending_variants == [0, 1]
+
+
+def test_choice_token_find():
+    template_tokenizer = DefaultTokenizer()
+    token_in_template_finder = ChoiceTokenInTemplateFinder()
+
+    find_token_in_template_result = token_in_template_finder.find_token_in_template(
+        template="[hello|hi]",
+        template_tokenizer=template_tokenizer,
+    )
+
+    expected_token = ChoiceToken(
+        choices=[
+            [
+                CharToken(char="h"),
+                CharToken(char="e"),
+                CharToken(char="l"),
+                CharToken(char="l"),
+                CharToken(char="o"),
+            ],
+            [
+                CharToken(char="h"),
+                CharToken(char="i"),
+            ],
+        ]
+    )
+
+    assert find_token_in_template_result.token == expected_token
+    assert find_token_in_template_result.end == 10
+
+
+def test_choice_token_match():
+    token = ChoiceToken(
+        choices=[
+            [
+                CharToken(char="h"),
+                CharToken(char="e"),
+                CharToken(char="l"),
+                CharToken(char="l"),
+                CharToken(char="o"),
+            ],
+            [
+                CharToken(char="h"),
+                CharToken(char="i"),
+            ],
+        ]
+    )
+
+    token_ending_variants = token.match_with_message(
+        message="hello",
+        tokens_with_message_matcher=TokensWithMessageMatcher(),
+    )
+
+    assert token_ending_variants == [5]
+
+
+def test_choice_token_match_short():
+    token = ChoiceToken(
+        choices=[
+            [
+                CharToken(char="h"),
+                CharToken(char="e"),
+                CharToken(char="l"),
+                CharToken(char="l"),
+                CharToken(char="o"),
+            ],
+            [
+                CharToken(char="h"),
+                CharToken(char="i"),
+            ],
+        ]
+    )
+
+    token_ending_variants = token.match_with_message(
+        message="hillo",
+        tokens_with_message_matcher=TokensWithMessageMatcher(),
+    )
+
+    assert token_ending_variants == [2]
+
+
+def test_choice_token_match_none():
+    token = ChoiceToken(
+        choices=[
+            [
+                CharToken(char="h"),
+                CharToken(char="e"),
+                CharToken(char="l"),
+                CharToken(char="l"),
+                CharToken(char="o"),
+            ],
+            [
+                CharToken(char="h"),
+                CharToken(char="i"),
+            ],
+        ]
+    )
+
+    token_ending_variants = token.match_with_message(
+        message="eee",
+        tokens_with_message_matcher=TokensWithMessageMatcher(),
+    )
+
+    assert token_ending_variants == []
+
+
+@mock.patch("random.choice")
+def test_choice_token_generation(choice_mock):
+    choices = [
+        [
+            CharToken(char="h"),
+            CharToken(char="e"),
+            CharToken(char="l"),
+            CharToken(char="l"),
+            CharToken(char="o"),
+        ],
+        [
+            CharToken(char="h"),
+            CharToken(char="i"),
+        ],
+    ]
+    choice_mock.return_value = choices[1]
+
+    message = ChoiceToken(choices=choices).generate_message()
+
+    assert message == "hi"
+    choice_mock.assert_called_once_with(choices)
+
+
+def test_choice_token_generation_empty():
+    choices = []
+
+    message = ChoiceToken(choices=choices).generate_message()
+
+    assert message == ""
+
+
+def test_choice_token_find_without_start_symbol():
+    template_tokenizer = DefaultTokenizer()
+    token_in_template_finder = ChoiceTokenInTemplateFinder()
+
+    find_token_in_template_result = token_in_template_finder.find_token_in_template(
+        template="hello|hi]",
+        template_tokenizer=template_tokenizer,
+    )
+
+    assert not find_token_in_template_result
+
+
+def test_choice_token_find_nested():
+    template_tokenizer = DefaultTokenizer()
+    token_in_template_finder = ChoiceTokenInTemplateFinder()
+
+    find_token_in_template_result = token_in_template_finder.find_token_in_template(
+        template="[h[e|a]llo|hi]",
+        template_tokenizer=template_tokenizer,
+    )
+
+    expected_token = ChoiceToken(
+        choices=[
+            [
+                CharToken(char="h"),
+                ChoiceToken(choices=[[CharToken(char="e")], [CharToken(char="a")]]),
+                CharToken(char="l"),
+                CharToken(char="l"),
+                CharToken(char="o"),
+            ],
+            [
+                CharToken(char="h"),
+                CharToken(char="i"),
+            ],
+        ]
+    )
+
+    assert find_token_in_template_result.token == expected_token
+    assert find_token_in_template_result.end == 14
+
+
+def test_choice_token_find_without_finish():
+    template_tokenizer = DefaultTokenizer()
+    token_in_template_finder = ChoiceTokenInTemplateFinder()
+
+    find_token_in_template_result = token_in_template_finder.find_token_in_template(
+        template="[hello|hi",
+        template_tokenizer=template_tokenizer,
+    )
+
+    assert not find_token_in_template_result

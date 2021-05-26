@@ -4,6 +4,7 @@ from coriander.core import BaseTemplateTokenizer, BaseToken, BaseTokenInTemplate
 from coriander.tokens import (
     AnyTokenInTemplateFinder,
     CharTokenInTemplateFinder,
+    ChoiceTokenInTemplateFinder,
     OptionalTokenInTemplateFinder,
 )
 
@@ -37,6 +38,7 @@ class DefaultTokenizer(TemplateTokenizer):
         token_in_template_finders = [
             AnyTokenInTemplateFinder(),
             OptionalTokenInTemplateFinder(),
+            ChoiceTokenInTemplateFinder(),
             CharTokenInTemplateFinder(),
         ]
 
