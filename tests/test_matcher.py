@@ -1,4 +1,7 @@
-from coriander.matching import TokensWithMessageMatcher
+from coriander.matching import (
+    DefaultMessageWithTemplateMatcher,
+    TokensWithMessageMatcher,
+)
 from coriander.tokens import AnyToken, CharToken
 
 
@@ -83,3 +86,25 @@ def test_any_token():
         message="hee",
     )
     assert tokens_ending_variants == [1, 2, 3]
+
+
+def test_default_matcher_success():
+    message_with_template_matcher = DefaultMessageWithTemplateMatcher()
+
+    result = message_with_template_matcher.match_message_with_template(
+        message="hello my name is Docker",
+        template="[hello|hi] my name is *",
+    )
+
+    assert result
+
+
+def test_default_matcher_fail():
+    message_with_template_matcher = DefaultMessageWithTemplateMatcher()
+
+    result = message_with_template_matcher.match_message_with_template(
+        message="hallo my name is Docker",
+        template="[hello|hi] my name is *",
+    )
+
+    assert not result

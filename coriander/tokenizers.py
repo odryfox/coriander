@@ -29,6 +29,7 @@ class TemplateTokenizer(BaseTemplateTokenizer):
                     tokens.append(find_result.token)
                     end = find_result.end
                     template = template[end:]
+                    break
 
         return tokens
 
