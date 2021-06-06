@@ -1,27 +1,34 @@
-from coriander.core import BaseMessageFromTemplateGenerator, BaseTemplateTokenizer
+from typing import List
+
+from coriander.core import BaseGenerator, BaseToken, BaseTokenizer
 from coriander.tokenizers import DefaultTokenizer
 
 
-class MessageFromTemplateGenerator(BaseMessageFromTemplateGenerator):
-    def __init__(self, template_tokenizer: BaseTemplateTokenizer) -> None:
-        self.template_tokenizer = template_tokenizer
+class Generator(BaseGenerator):
+    def __init__(self, tokenizer: BaseTokenizer) -> None:
+        self.tokenizer = tokenizer
 
-    def generate_message_from_template(
+    def generate(
         self,
         template: str,
     ) -> str:
-        tokens = self.template_tokenizer.template_tokenize(template=template)
+        tokens = self.tokenizer.tokenize(template=template)
+        return self.generate_from_tokens(tokens=tokens)
 
+    def generate_from_tokens(
+        self,
+        tokens: List["BaseToken"],
+    ) -> str:
         message_parts = []
 
         for token in tokens:
-            message_part = token.generate_message()
+            message_part = token.generate_message(generator=self)
             message_parts.append(message_part)
 
         return "".join(message_parts)
 
 
-class DefaultMessageFromTemplateGenerator(MessageFromTemplateGenerator):
+class DefaultGenerator(Generator):
     def __init__(self):
-        template_tokenizer = DefaultTokenizer()
-        super().__init__(template_tokenizer=template_tokenizer)
+        tokenizer = DefaultTokenizer()
+        super().__init__(tokenizer=tokenizer)

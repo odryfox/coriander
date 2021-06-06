@@ -1,16 +1,17 @@
 from unittest import mock
 
-from coriander.matching import TokensWithMessageMatcher
-from coriander.tokenizers import DefaultTokenizer, TemplateTokenizer
+from coriander.generation import DefaultGenerator
+from coriander.matching import Matcher
+from coriander.tokenizers import DefaultTokenizer, Tokenizer
 from coriander.tokens import (
     AnyToken,
-    AnyTokenInTemplateFinder,
+    AnyTokenFinder,
     CharToken,
-    CharTokenInTemplateFinder,
+    CharTokenFinder,
     ChoiceToken,
-    ChoiceTokenInTemplateFinder,
+    ChoiceTokenFinder,
     OptionalToken,
-    OptionalTokenInTemplateFinder,
+    OptionalTokenFinder,
 )
 
 
@@ -47,12 +48,12 @@ def test_choice_token_repr():
 
 
 def test_char_token():
-    template_tokenizer = DefaultTokenizer()
-    token_in_template_finder = CharTokenInTemplateFinder()
+    tokenizer = DefaultTokenizer()
+    token_in_template_finder = CharTokenFinder()
 
-    find_token_in_template_result = token_in_template_finder.find_token_in_template(
+    find_token_in_template_result = token_in_template_finder.find_in_template(
         template="hello",
-        template_tokenizer=template_tokenizer,
+        tokenizer=tokenizer,
     )
 
     assert find_token_in_template_result
@@ -61,12 +62,12 @@ def test_char_token():
 
 
 def test_any_token():
-    template_tokenizer = DefaultTokenizer()
-    token_in_template_finder = AnyTokenInTemplateFinder()
+    tokenizer = DefaultTokenizer()
+    token_in_template_finder = AnyTokenFinder()
 
-    find_token_in_template_result = token_in_template_finder.find_token_in_template(
+    find_token_in_template_result = token_in_template_finder.find_in_template(
         template="* hello",
-        template_tokenizer=template_tokenizer,
+        tokenizer=tokenizer,
     )
 
     assert find_token_in_template_result
@@ -75,12 +76,12 @@ def test_any_token():
 
 
 def test_optional_token():
-    template_tokenizer = DefaultTokenizer()
-    token_in_template_finder = OptionalTokenInTemplateFinder()
+    tokenizer = DefaultTokenizer()
+    token_in_template_finder = OptionalTokenFinder()
 
-    find_token_in_template_result = token_in_template_finder.find_token_in_template(
+    find_token_in_template_result = token_in_template_finder.find_in_template(
         template="(hello)",
-        template_tokenizer=template_tokenizer,
+        tokenizer=tokenizer,
     )
 
     expected_token = OptionalToken(
@@ -99,24 +100,24 @@ def test_optional_token():
 
 
 def test_optional_token_none():
-    template_tokenizer = DefaultTokenizer()
-    token_in_template_finder = OptionalTokenInTemplateFinder()
+    tokenizer = DefaultTokenizer()
+    token_in_template_finder = OptionalTokenFinder()
 
-    find_token_in_template_result = token_in_template_finder.find_token_in_template(
+    find_token_in_template_result = token_in_template_finder.find_in_template(
         template="hello",
-        template_tokenizer=template_tokenizer,
+        tokenizer=tokenizer,
     )
 
     assert not find_token_in_template_result
 
 
 def test_optional_token_nested():
-    template_tokenizer = DefaultTokenizer()
-    token_in_template_finder = OptionalTokenInTemplateFinder()
+    tokenizer = DefaultTokenizer()
+    token_in_template_finder = OptionalTokenFinder()
 
-    find_token_in_template_result = token_in_template_finder.find_token_in_template(
+    find_token_in_template_result = token_in_template_finder.find_in_template(
         template="((h)ello)",
-        template_tokenizer=template_tokenizer,
+        tokenizer=tokenizer,
     )
 
     expected_token = OptionalToken(
@@ -135,39 +136,39 @@ def test_optional_token_nested():
 
 
 def test_optional_token_without_finish_char():
-    template_tokenizer = DefaultTokenizer()
-    token_in_template_finder = OptionalTokenInTemplateFinder()
+    tokenizer = DefaultTokenizer()
+    token_in_template_finder = OptionalTokenFinder()
 
-    find_token_in_template_result = token_in_template_finder.find_token_in_template(
+    find_token_in_template_result = token_in_template_finder.find_in_template(
         template="((h)ello",
-        template_tokenizer=template_tokenizer,
+        tokenizer=tokenizer,
     )
 
     assert not find_token_in_template_result
 
 
 def test_not_any_token():
-    template_tokenizer = DefaultTokenizer()
-    token_in_template_finder = AnyTokenInTemplateFinder()
+    tokenizer = DefaultTokenizer()
+    token_in_template_finder = AnyTokenFinder()
 
-    find_token_in_template_result = token_in_template_finder.find_token_in_template(
+    find_token_in_template_result = token_in_template_finder.find_in_template(
         template="hello",
-        template_tokenizer=template_tokenizer,
+        tokenizer=tokenizer,
     )
 
     assert find_token_in_template_result is None
 
 
 def test_tokenizer():
-    token_in_template_finders = [
-        AnyTokenInTemplateFinder(),
-        CharTokenInTemplateFinder(),
+    token_finders = [
+        AnyTokenFinder(),
+        CharTokenFinder(),
     ]
-    template_tokenizer = TemplateTokenizer(
-        token_in_template_finders=token_in_template_finders,
+    tokenizer = Tokenizer(
+        token_finders=token_finders,
     )
 
-    actual_tokens = template_tokenizer.template_tokenize(template="* hello")
+    actual_tokens = tokenizer.tokenize(template="* hello")
 
     expected_tokens = [
         AnyToken(),
@@ -182,9 +183,9 @@ def test_tokenizer():
 
 
 def test_default_tokenizer():
-    template_tokenizer = DefaultTokenizer()
+    tokenizer = DefaultTokenizer()
 
-    actual_tokens = template_tokenizer.template_tokenize(template="* hello")
+    actual_tokens = tokenizer.tokenize(template="* hello")
 
     expected_tokens = [
         AnyToken(),
@@ -199,12 +200,12 @@ def test_default_tokenizer():
 
 
 def test_generate_any_token():
-    message = AnyToken().generate_message()
+    message = AnyToken().generate_message(generator=DefaultGenerator())
     assert message
 
 
 def test_generate_char_token():
-    message = CharToken(char="h").generate_message()
+    message = CharToken(char="h").generate_message(generator=DefaultGenerator())
     assert message == "h"
 
 
@@ -212,7 +213,9 @@ def test_generate_char_token():
 def test_generate_optional_token_true(choice_mock):
     choice_mock.return_value = True
 
-    message = OptionalToken(tokens=[CharToken("h")]).generate_message()
+    message = OptionalToken(tokens=[CharToken("h")]).generate_message(
+        generator=DefaultGenerator()
+    )
 
     assert message == "h"
     choice_mock.assert_called_once_with([True, False])
@@ -222,7 +225,9 @@ def test_generate_optional_token_true(choice_mock):
 def test_generate_optional_token_false(choice_mock):
     choice_mock.return_value = False
 
-    message = OptionalToken(tokens=[CharToken("h")]).generate_message()
+    message = OptionalToken(tokens=[CharToken("h")]).generate_message(
+        generator=DefaultGenerator()
+    )
 
     assert message == ""
     choice_mock.assert_called_once_with([True, False])
@@ -233,7 +238,7 @@ def test_any_token_match_with_message():
 
     token_ending_variants = token.match_with_message(
         message="hello",
-        tokens_with_message_matcher=TokensWithMessageMatcher(),
+        matcher=Matcher(tokenizer=DefaultTokenizer()),
     )
 
     assert token_ending_variants == [1, 2, 3, 4, 5]
@@ -244,7 +249,7 @@ def test_char_token_match_with_message():
 
     token_ending_variants = token.match_with_message(
         message="hello",
-        tokens_with_message_matcher=TokensWithMessageMatcher(),
+        matcher=Matcher(tokenizer=DefaultTokenizer()),
     )
 
     assert token_ending_variants == [1]
@@ -255,7 +260,7 @@ def test_char_token_match_with_message_incorrect():
 
     token_ending_variants = token.match_with_message(
         message="hello",
-        tokens_with_message_matcher=TokensWithMessageMatcher(),
+        matcher=Matcher(tokenizer=DefaultTokenizer()),
     )
 
     assert token_ending_variants == []
@@ -266,19 +271,19 @@ def test_optional_token_match_with_message():
 
     token_ending_variants = token.match_with_message(
         message="hello",
-        tokens_with_message_matcher=TokensWithMessageMatcher(),
+        matcher=Matcher(tokenizer=DefaultTokenizer()),
     )
 
     assert token_ending_variants == [0, 1]
 
 
 def test_choice_token_find():
-    template_tokenizer = DefaultTokenizer()
-    token_in_template_finder = ChoiceTokenInTemplateFinder()
+    tokenizer = DefaultTokenizer()
+    token_in_template_finder = ChoiceTokenFinder()
 
-    find_token_in_template_result = token_in_template_finder.find_token_in_template(
+    find_token_in_template_result = token_in_template_finder.find_in_template(
         template="[hello|hi]",
-        template_tokenizer=template_tokenizer,
+        tokenizer=tokenizer,
     )
 
     expected_token = ChoiceToken(
@@ -320,7 +325,7 @@ def test_choice_token_match():
 
     token_ending_variants = token.match_with_message(
         message="hello",
-        tokens_with_message_matcher=TokensWithMessageMatcher(),
+        matcher=Matcher(tokenizer=DefaultTokenizer()),
     )
 
     assert token_ending_variants == [5]
@@ -345,7 +350,7 @@ def test_choice_token_match_short():
 
     token_ending_variants = token.match_with_message(
         message="hillo",
-        tokens_with_message_matcher=TokensWithMessageMatcher(),
+        matcher=Matcher(tokenizer=DefaultTokenizer()),
     )
 
     assert token_ending_variants == [2]
@@ -370,7 +375,7 @@ def test_choice_token_match_none():
 
     token_ending_variants = token.match_with_message(
         message="eee",
-        tokens_with_message_matcher=TokensWithMessageMatcher(),
+        matcher=Matcher(tokenizer=DefaultTokenizer()),
     )
 
     assert token_ending_variants == []
@@ -393,7 +398,9 @@ def test_choice_token_generation(choice_mock):
     ]
     choice_mock.return_value = choices[1]
 
-    message = ChoiceToken(choices=choices).generate_message()
+    message = ChoiceToken(choices=choices).generate_message(
+        generator=DefaultGenerator()
+    )
 
     assert message == "hi"
     choice_mock.assert_called_once_with(choices)
@@ -402,30 +409,32 @@ def test_choice_token_generation(choice_mock):
 def test_choice_token_generation_empty():
     choices = []
 
-    message = ChoiceToken(choices=choices).generate_message()
+    message = ChoiceToken(choices=choices).generate_message(
+        generator=DefaultGenerator()
+    )
 
     assert message == ""
 
 
 def test_choice_token_find_without_start_symbol():
-    template_tokenizer = DefaultTokenizer()
-    token_in_template_finder = ChoiceTokenInTemplateFinder()
+    tokenizer = DefaultTokenizer()
+    token_in_template_finder = ChoiceTokenFinder()
 
-    find_token_in_template_result = token_in_template_finder.find_token_in_template(
+    find_token_in_template_result = token_in_template_finder.find_in_template(
         template="hello|hi]",
-        template_tokenizer=template_tokenizer,
+        tokenizer=tokenizer,
     )
 
     assert not find_token_in_template_result
 
 
 def test_choice_token_find_nested():
-    template_tokenizer = DefaultTokenizer()
-    token_in_template_finder = ChoiceTokenInTemplateFinder()
+    tokenizer = DefaultTokenizer()
+    token_in_template_finder = ChoiceTokenFinder()
 
-    find_token_in_template_result = token_in_template_finder.find_token_in_template(
+    find_token_in_template_result = token_in_template_finder.find_in_template(
         template="[h[e|a]llo|hi]",
-        template_tokenizer=template_tokenizer,
+        tokenizer=tokenizer,
     )
 
     expected_token = ChoiceToken(
@@ -449,12 +458,12 @@ def test_choice_token_find_nested():
 
 
 def test_choice_token_find_without_finish():
-    template_tokenizer = DefaultTokenizer()
-    token_in_template_finder = ChoiceTokenInTemplateFinder()
+    tokenizer = DefaultTokenizer()
+    token_in_template_finder = ChoiceTokenFinder()
 
-    find_token_in_template_result = token_in_template_finder.find_token_in_template(
+    find_token_in_template_result = token_in_template_finder.find_in_template(
         template="[hello|hi",
-        template_tokenizer=template_tokenizer,
+        tokenizer=tokenizer,
     )
 
     assert not find_token_in_template_result

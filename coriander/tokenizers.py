@@ -1,29 +1,29 @@
 from typing import Iterable, List
 
-from coriander.core import BaseTemplateTokenizer, BaseToken, BaseTokenInTemplateFinder
+from coriander.core import BaseToken, BaseTokenFinder, BaseTokenizer
 from coriander.tokens import (
-    AnyTokenInTemplateFinder,
-    CharTokenInTemplateFinder,
-    ChoiceTokenInTemplateFinder,
-    OptionalTokenInTemplateFinder,
+    AnyTokenFinder,
+    CharTokenFinder,
+    ChoiceTokenFinder,
+    OptionalTokenFinder,
 )
 
 
-class TemplateTokenizer(BaseTemplateTokenizer):
+class Tokenizer(BaseTokenizer):
     def __init__(
         self,
-        token_in_template_finders: Iterable[BaseTokenInTemplateFinder],
+        token_finders: Iterable[BaseTokenFinder],
     ) -> None:
-        self.token_in_template_finders = token_in_template_finders
+        self.token_finders = token_finders
 
-    def template_tokenize(self, template: str) -> List[BaseToken]:
+    def tokenize(self, template: str) -> List[BaseToken]:
         tokens = []
 
         while template:
-            for token_in_template_finder in self.token_in_template_finders:
-                find_result = token_in_template_finder.find_token_in_template(
+            for token_finder in self.token_finders:
+                find_result = token_finder.find_in_template(
                     template=template,
-                    template_tokenizer=self,
+                    tokenizer=self,
                 )
                 if find_result:
                     tokens.append(find_result.token)
@@ -34,13 +34,13 @@ class TemplateTokenizer(BaseTemplateTokenizer):
         return tokens
 
 
-class DefaultTokenizer(TemplateTokenizer):
+class DefaultTokenizer(Tokenizer):
     def __init__(self) -> None:
-        token_in_template_finders = [
-            AnyTokenInTemplateFinder(),
-            OptionalTokenInTemplateFinder(),
-            ChoiceTokenInTemplateFinder(),
-            CharTokenInTemplateFinder(),
+        token_finders = [
+            AnyTokenFinder(),
+            OptionalTokenFinder(),
+            ChoiceTokenFinder(),
+            CharTokenFinder(),
         ]
 
-        super().__init__(token_in_template_finders=token_in_template_finders)
+        super().__init__(token_finders=token_finders)

@@ -1,19 +1,37 @@
 from typing import List
 
-from coriander.core import (
-    BaseMessageWithTemplateMatcher,
-    BaseTemplateTokenizer,
-    BaseToken,
-    BaseTokensWithMessageMatcher,
-)
+from coriander.core import BaseMatcher, BaseToken, BaseTokenizer
 from coriander.tokenizers import DefaultTokenizer
 
 
-class TokensWithMessageMatcher(BaseTokensWithMessageMatcher):
-    def match_tokens_with_message(
+class Matcher(BaseMatcher):
+    def __init__(
         self,
-        tokens: List[BaseToken],
+        tokenizer: BaseTokenizer,
+    ) -> None:
+        self.tokenizer = tokenizer
+
+    def match(
+        self,
         message: str,
+        template: str,
+    ) -> bool:
+        tokens = self.tokenizer.tokenize(template=template)
+        tokens_ending_variants = self.match_with_tokens(
+            message=message,
+            tokens=tokens,
+        )
+
+        try:
+            tokens_ending_variants.index(len(message))
+            return True
+        except ValueError:
+            return False
+
+    def match_with_tokens(
+        self,
+        message: str,
+        tokens: List[BaseToken],
     ) -> List[int]:
         if not tokens:
             return [0]
@@ -23,15 +41,15 @@ class TokensWithMessageMatcher(BaseTokensWithMessageMatcher):
 
         current_token_ending_variants = tokens[0].match_with_message(
             message=message,
-            tokens_with_message_matcher=self,
+            matcher=self,
         )
 
         token_ending_variants_set = set()
 
         for current_token_ending_variant in current_token_ending_variants:
-            other_tokens_ending_variants = self.match_tokens_with_message(
-                tokens=tokens[1:],
+            other_tokens_ending_variants = self.match_with_tokens(
                 message=message[current_token_ending_variant:],
+                tokens=tokens[1:],
             )
             for other_tokens_ending_variant in other_tokens_ending_variants:
                 token_ending_variants_set.add(
@@ -41,36 +59,9 @@ class TokensWithMessageMatcher(BaseTokensWithMessageMatcher):
         return list(sorted(token_ending_variants_set))
 
 
-class MessageWithTemplateMatcher(BaseMessageWithTemplateMatcher):
-    def __init__(
-        self,
-        template_tokenizer: BaseTemplateTokenizer,
-    ) -> None:
-        self.template_tokenizer = template_tokenizer
-
-    def match_message_with_template(
-        self,
-        message: str,
-        template: str,
-    ) -> bool:
-        tokens_with_message_matcher = TokensWithMessageMatcher()
-
-        tokens = self.template_tokenizer.template_tokenize(template=template)
-        tokens_ending_variants = tokens_with_message_matcher.match_tokens_with_message(
-            tokens=tokens,
-            message=message,
-        )
-
-        try:
-            tokens_ending_variants.index(len(message))
-            return True
-        except ValueError:
-            return False
-
-
-class DefaultMessageWithTemplateMatcher(MessageWithTemplateMatcher):
+class DefaultMatcher(Matcher):
     def __init__(self) -> None:
-        template_tokenizer = DefaultTokenizer()
-        super(DefaultMessageWithTemplateMatcher, self).__init__(
-            template_tokenizer=template_tokenizer,
+        tokenizer = DefaultTokenizer()
+        super(DefaultMatcher, self).__init__(
+            tokenizer=tokenizer,
         )

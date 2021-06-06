@@ -2,14 +2,20 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 
 
-class BaseMessageWithTemplateMatcher(ABC):
+class FindTokenInTemplateResult:
+    def __init__(self, token: "BaseToken", end: int) -> None:
+        self.token = token
+        self.end = end
+
+
+class BaseTokenFinder(ABC):
     @abstractmethod
-    def match_message_with_template(
+    def find_in_template(
         self,
-        message: str,
         template: str,
-    ) -> bool:
-        """Match message and template."""
+        tokenizer: "BaseTokenizer",
+    ) -> Optional[FindTokenInTemplateResult]:
+        """Find token in start of template."""
 
 
 class BaseToken(ABC):
@@ -17,51 +23,53 @@ class BaseToken(ABC):
     def match_with_message(
         self,
         message: str,
-        tokens_with_message_matcher: "BaseTokensWithMessageMatcher",
+        matcher: "BaseMatcher",
     ) -> List[int]:
         """Match token with start of message. Return variants ending of token."""
 
     @abstractmethod
-    def generate_message(self) -> str:
+    def generate_message(
+        self,
+        generator: "BaseGenerator",
+    ) -> str:
         """Generate message."""
 
 
-class BaseTokensWithMessageMatcher(ABC):
+class BaseTokenizer(ABC):
     @abstractmethod
-    def match_tokens_with_message(
+    def tokenize(self, template: str) -> List[BaseToken]:
+        """Convert template to list of tokens."""
+
+
+class BaseMatcher(ABC):
+    @abstractmethod
+    def match(
         self,
-        tokens: List[BaseToken],
         message: str,
+        template: str,
+    ) -> bool:
+        """Match message and template."""
+
+    @abstractmethod
+    def match_with_tokens(
+        self,
+        message: str,
+        tokens: List["BaseToken"],
     ) -> List[int]:
         """Match tokens with start of message. Return variants ending of tokens."""
 
 
-class BaseTemplateTokenizer(ABC):
+class BaseGenerator(ABC):
     @abstractmethod
-    def template_tokenize(self, template: str) -> List[BaseToken]:
-        """Convert template to list of tokens."""
-
-
-class FindTokenInTemplateResult:
-    def __init__(self, token: BaseToken, end: int) -> None:
-        self.token = token
-        self.end = end
-
-
-class BaseTokenInTemplateFinder(ABC):
-    @abstractmethod
-    def find_token_in_template(
-        self,
-        template: str,
-        template_tokenizer: BaseTemplateTokenizer,
-    ) -> Optional[FindTokenInTemplateResult]:
-        """Find token in start of template."""
-
-
-class BaseMessageFromTemplateGenerator(ABC):
-    @abstractmethod
-    def generate_message_from_template(
+    def generate(
         self,
         template: str,
     ) -> str:
         """Generate message from template."""
+
+    @abstractmethod
+    def generate_from_tokens(
+        self,
+        tokens: List["BaseToken"],
+    ) -> str:
+        """Generate message from tokens."""

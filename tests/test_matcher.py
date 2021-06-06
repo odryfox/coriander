@@ -1,7 +1,4 @@
-from coriander.matching import (
-    DefaultMessageWithTemplateMatcher,
-    TokensWithMessageMatcher,
-)
+from coriander.matching import DefaultMatcher, Matcher
 from coriander.tokens import AnyToken, CharToken
 
 
@@ -12,7 +9,7 @@ def test_correct_message():
         AnyToken(),
         CharToken(char="o"),
     ]
-    tokens_ending_variants = TokensWithMessageMatcher().match_tokens_with_message(
+    tokens_ending_variants = Matcher(tokenizer=None).match_with_tokens(
         tokens=tokens,
         message="hello",
     )
@@ -26,7 +23,7 @@ def test_incorrect_message():
         AnyToken(),
         CharToken(char="a"),
     ]
-    tokens_ending_variants = TokensWithMessageMatcher().match_tokens_with_message(
+    tokens_ending_variants = Matcher(tokenizer=None).match_with_tokens(
         tokens=tokens,
         message="hello",
     )
@@ -40,7 +37,7 @@ def test_tokens_and_empty_message():
         AnyToken(),
         CharToken(char="o"),
     ]
-    tokens_ending_variants = TokensWithMessageMatcher().match_tokens_with_message(
+    tokens_ending_variants = Matcher(tokenizer=None).match_with_tokens(
         tokens=tokens,
         message="",
     )
@@ -49,7 +46,7 @@ def test_tokens_and_empty_message():
 
 def test_empty_tokens_and_empty_message():
     tokens = []
-    tokens_ending_variants = TokensWithMessageMatcher().match_tokens_with_message(
+    tokens_ending_variants = Matcher(tokenizer=None).match_with_tokens(
         tokens=tokens,
         message="",
     )
@@ -58,7 +55,7 @@ def test_empty_tokens_and_empty_message():
 
 def test_empty_tokens_and_message():
     tokens = []
-    tokens_ending_variants = TokensWithMessageMatcher().match_tokens_with_message(
+    tokens_ending_variants = Matcher(tokenizer=None).match_with_tokens(
         tokens=tokens,
         message="hello",
     )
@@ -70,7 +67,7 @@ def test_any_variants():
         AnyToken(),
         CharToken(char="e"),
     ]
-    tokens_ending_variants = TokensWithMessageMatcher().match_tokens_with_message(
+    tokens_ending_variants = Matcher(tokenizer=None).match_with_tokens(
         tokens=tokens,
         message="hee",
     )
@@ -81,7 +78,7 @@ def test_any_token():
     tokens = [
         AnyToken(),
     ]
-    tokens_ending_variants = TokensWithMessageMatcher().match_tokens_with_message(
+    tokens_ending_variants = Matcher(tokenizer=None).match_with_tokens(
         tokens=tokens,
         message="hee",
     )
@@ -89,9 +86,9 @@ def test_any_token():
 
 
 def test_default_matcher_success():
-    message_with_template_matcher = DefaultMessageWithTemplateMatcher()
+    matcher = DefaultMatcher()
 
-    result = message_with_template_matcher.match_message_with_template(
+    result = matcher.match(
         message="hello my name is Docker",
         template="[hello|hi] my name is *",
     )
@@ -100,9 +97,9 @@ def test_default_matcher_success():
 
 
 def test_default_matcher_fail():
-    message_with_template_matcher = DefaultMessageWithTemplateMatcher()
+    matcher = DefaultMatcher()
 
-    result = message_with_template_matcher.match_message_with_template(
+    result = matcher.match(
         message="hallo my name is Docker",
         template="[hello|hi] my name is *",
     )

@@ -1,16 +1,13 @@
-from coriander.generation import (
-    DefaultMessageFromTemplateGenerator,
-    MessageFromTemplateGenerator,
-)
+from coriander.generation import DefaultGenerator, Generator
 from coriander.tokenizers import DefaultTokenizer
 
 
 def test_generation():
-    template_tokenizer = DefaultTokenizer()
-    generator = MessageFromTemplateGenerator(template_tokenizer=template_tokenizer)
+    tokenizer = DefaultTokenizer()
+    generator = Generator(tokenizer=tokenizer)
     template = "he*o"
 
-    message = generator.generate_message_from_template(template=template)
+    message = generator.generate(template=template)
 
     assert message[0] == "h"
     assert message[1] == "e"
@@ -20,10 +17,10 @@ def test_generation():
 
 
 def test_default_generation():
-    generator = DefaultMessageFromTemplateGenerator()
+    generator = DefaultGenerator()
     template = "he*o"
 
-    message = generator.generate_message_from_template(template=template)
+    message = generator.generate(template=template)
 
     assert message[0] == "h"
     assert message[1] == "e"

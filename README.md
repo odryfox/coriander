@@ -1,23 +1,23 @@
 <p>A simple library for intent classification and named-entity recognition using templates.</p>
 
 ```python
-from coriander.matching import DefaultMessageWithTemplateMatcher
+from coriander.matching import DefaultMatcher
 
 
-DefaultMessageWithTemplateMatcher().match_message_with_template(
+DefaultMatcher().match(
     message="hello my name is Coriander",
     template="[hello|hi] my name is *",
 )
 # True
 
-DefaultMessageWithTemplateMatcher().match_message_with_template(
-    message="hi my name is Coriander",
+DefaultMatcher().match(
+    message="hi my name is Millet",
     template="[hello|hi] my name is *",
 )
 # True
 
-DefaultMessageWithTemplateMatcher().match_message_with_template(
-    message="hallo my name is Coriander",
+DefaultMatcher().match(
+    message="hallo my name is Galangal",
     template="[hello|hi] my name is *",
 )
 # False
