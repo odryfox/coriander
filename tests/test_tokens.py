@@ -467,3 +467,38 @@ def test_choice_token_find_without_finish():
     )
 
     assert not find_token_in_template_result
+
+
+def test_tokenize_with_associate_name():
+    tokenizer = DefaultTokenizer()
+
+    tokens = tokenizer.tokenize(
+        template="[Docker|Coriander]~name",
+    )
+
+    assert tokens
+    assert tokens[0].associate_name == "name"
+
+
+def test_tokenize_with_associate_name_with_underscore():
+    tokenizer = DefaultTokenizer()
+
+    tokens = tokenizer.tokenize(
+        template="[Docker|Coriander]~first_name",
+    )
+
+    assert tokens
+    assert tokens[0].associate_name == "first_name"
+
+
+def test_tokenize_with_associate_names():
+    tokenizer = DefaultTokenizer()
+
+    tokens = tokenizer.tokenize(
+        template="[Docker|Coriander]~name [12|21]~age",
+    )
+
+    assert tokens
+    assert tokens[0].associate_name == "name"
+    assert tokens[1].associate_name is None  # space char
+    assert tokens[2].associate_name == "age"

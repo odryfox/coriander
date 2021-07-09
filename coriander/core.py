@@ -19,6 +19,8 @@ class BaseTokenFinder(ABC):
 
 
 class BaseToken(ABC):
+    associate_name: Optional[str] = None
+
     @abstractmethod
     def match_with_message(
         self,
