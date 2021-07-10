@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import Any, List, Optional
 
 
 class FindTokenInTemplateResult:
@@ -18,6 +18,18 @@ class BaseTokenFinder(ABC):
         """Find token in start of template."""
 
 
+class MatchTokenWithMessageResult:
+    def __init__(
+        self,
+        end: int,
+        value: Any = None,
+        context: Optional[dict] = None,
+    ) -> None:
+        self.end = end
+        self.value = value
+        self.context = context
+
+
 class BaseToken(ABC):
     associate_name: Optional[str] = None
 
@@ -26,7 +38,7 @@ class BaseToken(ABC):
         self,
         message: str,
         matcher: "BaseMatcher",
-    ) -> List[int]:
+    ) -> List[MatchTokenWithMessageResult]:
         """Match token with start of message. Return variants ending of token."""
 
     @abstractmethod
@@ -43,13 +55,28 @@ class BaseTokenizer(ABC):
         """Convert template to list of tokens."""
 
 
+class MatchTokensWithMessageResult:
+    def __init__(self, end: int, context: dict) -> None:
+        self.end = end
+        self.context = context
+
+
+class MatchResult:
+    def __init__(self, success: bool, context: dict) -> None:
+        self.success = success
+        self.context = context
+
+    def __bool__(self) -> bool:
+        return self.success
+
+
 class BaseMatcher(ABC):
     @abstractmethod
     def match(
         self,
         message: str,
         template: str,
-    ) -> bool:
+    ) -> MatchResult:
         """Match message and template."""
 
     @abstractmethod
@@ -57,7 +84,7 @@ class BaseMatcher(ABC):
         self,
         message: str,
         tokens: List["BaseToken"],
-    ) -> List[int]:
+    ) -> List[MatchTokensWithMessageResult]:
         """Match tokens with start of message. Return variants ending of tokens."""
 
 

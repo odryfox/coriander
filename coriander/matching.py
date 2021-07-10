@@ -1,6 +1,12 @@
 from typing import List
 
-from coriander.core import BaseMatcher, BaseToken, BaseTokenizer
+from coriander.core import (
+    BaseMatcher,
+    BaseToken,
+    BaseTokenizer,
+    MatchResult,
+    MatchTokensWithMessageResult,
+)
 from coriander.tokenizers import DefaultTokenizer
 
 
@@ -15,48 +21,70 @@ class Matcher(BaseMatcher):
         self,
         message: str,
         template: str,
-    ) -> bool:
+    ) -> MatchResult:
         tokens = self.tokenizer.tokenize(template=template)
-        tokens_ending_variants = self.match_with_tokens(
+        match_tokens_with_message_results = self.match_with_tokens(
             message=message,
             tokens=tokens,
         )
 
-        try:
-            tokens_ending_variants.index(len(message))
-            return True
-        except ValueError:
-            return False
+        for match_tokens_with_message_result in match_tokens_with_message_results:
+            if match_tokens_with_message_result.end == len(message):
+                return MatchResult(
+                    success=True,
+                    context=match_tokens_with_message_result.context,
+                )
+
+        return MatchResult(
+            success=False,
+            context={},
+        )
 
     def match_with_tokens(
         self,
         message: str,
         tokens: List[BaseToken],
-    ) -> List[int]:
+    ) -> List[MatchTokensWithMessageResult]:
         if not tokens:
-            return [0]
+            return [
+                MatchTokensWithMessageResult(
+                    end=0,
+                    context={},
+                )
+            ]
 
         if not message:
             return []
 
-        current_token_ending_variants = tokens[0].match_with_message(
+        match_token_with_message_results = tokens[0].match_with_message(
             message=message,
             matcher=self,
         )
 
-        token_ending_variants_set = set()
+        result = set()
 
-        for current_token_ending_variant in current_token_ending_variants:
-            other_tokens_ending_variants = self.match_with_tokens(
-                message=message[current_token_ending_variant:],
+        for match_token_with_message_result in match_token_with_message_results:
+            context = {}
+            associate_name = tokens[0].associate_name
+            if associate_name:
+                context[associate_name] = match_token_with_message_result.value
+                if match_token_with_message_result.context:
+                    context = {**context, **match_token_with_message_result.context}
+
+            other_match_tokens_with_message_results = self.match_with_tokens(
+                message=message[match_token_with_message_result.end :],
                 tokens=tokens[1:],
             )
-            for other_tokens_ending_variant in other_tokens_ending_variants:
-                token_ending_variants_set.add(
-                    other_tokens_ending_variant + current_token_ending_variant
+            for other_result in other_match_tokens_with_message_results:
+                context = {**context, **other_result.context}
+                result.add(
+                    MatchTokensWithMessageResult(
+                        end=other_result.end + match_token_with_message_result.end,
+                        context=context,
+                    )
                 )
 
-        return list(sorted(token_ending_variants_set))
+        return list(sorted(result, key=lambda x: x.end))
 
 
 class DefaultMatcher(Matcher):

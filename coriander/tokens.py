@@ -9,6 +9,7 @@ from coriander.core import (
     BaseTokenFinder,
     BaseTokenizer,
     FindTokenInTemplateResult,
+    MatchTokenWithMessageResult,
 )
 
 
@@ -23,8 +24,17 @@ class AnyToken(BaseToken):
         self,
         message: str,
         matcher: BaseMatcher,
-    ) -> List[int]:
-        return list(range(1, len(message) + 1))
+    ) -> List[MatchTokenWithMessageResult]:
+        result = []
+        for end in range(1, len(message) + 1):
+            result.append(
+                MatchTokenWithMessageResult(
+                    value=message[:end],
+                    end=end,
+                    context={},
+                )
+            )
+        return result
 
     def generate_message(
         self,
@@ -62,9 +72,9 @@ class CharToken(BaseToken):
         self,
         message: str,
         matcher: BaseMatcher,
-    ) -> List[int]:
+    ) -> List[MatchTokenWithMessageResult]:
         if message[0] == self.char:
-            return [1]
+            return [MatchTokenWithMessageResult(value=message[0], end=1)]
         return []
 
     def generate_message(
@@ -99,12 +109,18 @@ class OptionalToken(BaseToken):
         self,
         message: str,
         matcher: BaseMatcher,
-    ) -> List[int]:
-        tokens_ending_variants = matcher.match_with_tokens(
+    ) -> List[MatchTokenWithMessageResult]:
+        match_tokens_with_message_results = matcher.match_with_tokens(
             message=message,
             tokens=self.tokens,
         )
-        return [0] + tokens_ending_variants
+        return [MatchTokenWithMessageResult(end=0)] + [
+            MatchTokenWithMessageResult(
+                end=r.end,
+                context=r.context,
+            )
+            for r in match_tokens_with_message_results
+        ]
 
     def generate_message(
         self,
@@ -166,18 +182,26 @@ class ChoiceToken(BaseToken):
         self,
         message: str,
         matcher: BaseMatcher,
-    ) -> List[int]:
+    ) -> List[MatchTokenWithMessageResult]:
 
-        variants = set()
+        variants = {}
 
-        for choice in self.choices:
-            tokens_ending_variants = matcher.match_with_tokens(
+        for index, choice in enumerate(self.choices):
+            match_tokens_with_message_results = matcher.match_with_tokens(
                 message=message,
                 tokens=choice,
             )
-            variants.update(tokens_ending_variants)
+            variants[index] = match_tokens_with_message_results
 
-        return sorted(list(variants))
+        return [
+            MatchTokenWithMessageResult(
+                end=match_tokens_with_message_result.end,
+                value=message[: match_tokens_with_message_result.end],
+                context=match_tokens_with_message_result.context,
+            )
+            for key, match_tokens_with_message_results in variants.items()
+            for match_tokens_with_message_result in match_tokens_with_message_results
+        ]
 
     def generate_message(
         self,

@@ -236,45 +236,50 @@ def test_generate_optional_token_false(choice_mock):
 def test_any_token_match_with_message():
     token = AnyToken()
 
-    token_ending_variants = token.match_with_message(
+    match_token_with_message_results = token.match_with_message(
         message="hello",
         matcher=Matcher(tokenizer=DefaultTokenizer()),
     )
 
-    assert token_ending_variants == [1, 2, 3, 4, 5]
+    assert match_token_with_message_results[0].end == 1
+    assert match_token_with_message_results[1].end == 2
+    assert match_token_with_message_results[2].end == 3
+    assert match_token_with_message_results[3].end == 4
+    assert match_token_with_message_results[4].end == 5
 
 
 def test_char_token_match_with_message():
     token = CharToken(char="h")
 
-    token_ending_variants = token.match_with_message(
+    match_token_with_message_results = token.match_with_message(
         message="hello",
         matcher=Matcher(tokenizer=DefaultTokenizer()),
     )
 
-    assert token_ending_variants == [1]
+    assert match_token_with_message_results[0].end == 1
 
 
 def test_char_token_match_with_message_incorrect():
     token = CharToken(char="a")
 
-    token_ending_variants = token.match_with_message(
+    match_token_with_message_results = token.match_with_message(
         message="hello",
         matcher=Matcher(tokenizer=DefaultTokenizer()),
     )
 
-    assert token_ending_variants == []
+    assert match_token_with_message_results == []
 
 
 def test_optional_token_match_with_message():
     token = OptionalToken(tokens=[CharToken(char="h")])
 
-    token_ending_variants = token.match_with_message(
+    match_token_with_message_results = token.match_with_message(
         message="hello",
         matcher=Matcher(tokenizer=DefaultTokenizer()),
     )
 
-    assert token_ending_variants == [0, 1]
+    assert match_token_with_message_results[0].end == 0
+    assert match_token_with_message_results[1].end == 1
 
 
 def test_choice_token_find():
@@ -323,12 +328,12 @@ def test_choice_token_match():
         ]
     )
 
-    token_ending_variants = token.match_with_message(
+    match_token_with_message_results = token.match_with_message(
         message="hello",
         matcher=Matcher(tokenizer=DefaultTokenizer()),
     )
 
-    assert token_ending_variants == [5]
+    assert match_token_with_message_results[0].end == 5
 
 
 def test_choice_token_match_short():
@@ -348,12 +353,12 @@ def test_choice_token_match_short():
         ]
     )
 
-    token_ending_variants = token.match_with_message(
+    match_token_with_message_results = token.match_with_message(
         message="hillo",
         matcher=Matcher(tokenizer=DefaultTokenizer()),
     )
 
-    assert token_ending_variants == [2]
+    assert match_token_with_message_results[0].end == 2
 
 
 def test_choice_token_match_none():

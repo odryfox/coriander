@@ -9,11 +9,11 @@ def test_correct_message():
         AnyToken(),
         CharToken(char="o"),
     ]
-    tokens_ending_variants = Matcher(tokenizer=None).match_with_tokens(
+    match_tokens_with_message_results = Matcher(tokenizer=None).match_with_tokens(
         tokens=tokens,
         message="hello",
     )
-    assert tokens_ending_variants == [5]
+    assert match_tokens_with_message_results[0].end == 5
 
 
 def test_incorrect_message():
@@ -23,11 +23,11 @@ def test_incorrect_message():
         AnyToken(),
         CharToken(char="a"),
     ]
-    tokens_ending_variants = Matcher(tokenizer=None).match_with_tokens(
+    match_tokens_with_message_results = Matcher(tokenizer=None).match_with_tokens(
         tokens=tokens,
         message="hello",
     )
-    assert tokens_ending_variants == []
+    assert match_tokens_with_message_results == []
 
 
 def test_tokens_and_empty_message():
@@ -37,29 +37,29 @@ def test_tokens_and_empty_message():
         AnyToken(),
         CharToken(char="o"),
     ]
-    tokens_ending_variants = Matcher(tokenizer=None).match_with_tokens(
+    match_tokens_with_message_results = Matcher(tokenizer=None).match_with_tokens(
         tokens=tokens,
         message="",
     )
-    assert tokens_ending_variants == []
+    assert match_tokens_with_message_results == []
 
 
 def test_empty_tokens_and_empty_message():
     tokens = []
-    tokens_ending_variants = Matcher(tokenizer=None).match_with_tokens(
+    match_tokens_with_message_results = Matcher(tokenizer=None).match_with_tokens(
         tokens=tokens,
         message="",
     )
-    assert tokens_ending_variants == [0]
+    assert match_tokens_with_message_results[0].end == 0
 
 
 def test_empty_tokens_and_message():
     tokens = []
-    tokens_ending_variants = Matcher(tokenizer=None).match_with_tokens(
+    match_tokens_with_message_results = Matcher(tokenizer=None).match_with_tokens(
         tokens=tokens,
         message="hello",
     )
-    assert tokens_ending_variants == [0]
+    assert match_tokens_with_message_results[0].end == 0
 
 
 def test_any_variants():
@@ -67,22 +67,25 @@ def test_any_variants():
         AnyToken(),
         CharToken(char="e"),
     ]
-    tokens_ending_variants = Matcher(tokenizer=None).match_with_tokens(
+    match_tokens_with_message_results = Matcher(tokenizer=None).match_with_tokens(
         tokens=tokens,
         message="hee",
     )
-    assert tokens_ending_variants == [2, 3]
+    assert match_tokens_with_message_results[0].end == 2
+    assert match_tokens_with_message_results[1].end == 3
 
 
 def test_any_token():
     tokens = [
         AnyToken(),
     ]
-    tokens_ending_variants = Matcher(tokenizer=None).match_with_tokens(
+    match_tokens_with_message_results = Matcher(tokenizer=None).match_with_tokens(
         tokens=tokens,
         message="hee",
     )
-    assert tokens_ending_variants == [1, 2, 3]
+    assert match_tokens_with_message_results[0].end == 1
+    assert match_tokens_with_message_results[1].end == 2
+    assert match_tokens_with_message_results[2].end == 3
 
 
 def test_default_matcher_success():
@@ -94,6 +97,81 @@ def test_default_matcher_success():
     )
 
     assert result
+
+
+def test_associate_name():
+    matcher = DefaultMatcher()
+
+    result = matcher.match(
+        message="hello",
+        template="[hello|hi]~greeting",
+    )
+
+    assert result
+    assert result.context["greeting"] == "hello"
+
+
+def test_associate_name_2():
+    matcher = DefaultMatcher()
+
+    result = matcher.match(
+        message="hi",
+        template="[hello|hi]~greeting",
+    )
+
+    assert result
+    assert result.context["greeting"] == "hi"
+
+
+def test_associate_name_nested():
+    matcher = DefaultMatcher()
+
+    result = matcher.match(
+        message="millet",
+        template="[[galangal|millet]~name|hi]~greeting",
+    )
+
+    assert result
+    assert result.context["greeting"] == "millet"
+    assert result.context["name"] == "millet"
+
+
+def test_associate_name_nested_2():
+    matcher = DefaultMatcher()
+
+    result = matcher.match(
+        message="hi",
+        template="[[galangal|millet]~name|hi]~greeting",
+    )
+
+    assert result
+    assert result.context["greeting"] == "hi"
+    assert "name" not in result.context
+
+
+def test_associate_name_few():
+    matcher = DefaultMatcher()
+
+    result = matcher.match(
+        message="millet hello",
+        template="[galangal|millet]~name [hello|hi]~greeting",
+    )
+
+    assert result
+    assert result.context["name"] == "millet"
+    assert result.context["greeting"] == "hello"
+
+
+def test_associate_name_any():
+    matcher = DefaultMatcher()
+
+    result = matcher.match(
+        message="millet hello",
+        template="*~name hello",
+    )
+
+    assert result
+    assert result.context["name"] == "millet"
 
 
 def test_default_matcher_fail():
