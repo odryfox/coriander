@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from coriander.core import BaseGenerator, BaseToken, BaseTokenizer
 from coriander.tokenizers import DefaultTokenizer
@@ -11,18 +11,29 @@ class Generator(BaseGenerator):
     def generate(
         self,
         template: str,
+        context: Optional[dict] = None,
     ) -> str:
+        context = context or {}
         tokens = self.tokenizer.tokenize(template=template)
-        return self.generate_from_tokens(tokens=tokens)
+        return self.generate_from_tokens(tokens=tokens, context=context)
 
     def generate_from_tokens(
         self,
         tokens: List["BaseToken"],
+        context: dict,
     ) -> str:
         message_parts = []
 
         for token in tokens:
-            message_part = token.generate_message(generator=self)
+            if token.associate_name in context:
+                value = context[token.associate_name]
+            else:
+                value = None
+            message_part = token.generate_message(
+                generator=self,
+                value=value,
+                context=context,
+            )
             message_parts.append(message_part)
 
         return "".join(message_parts)

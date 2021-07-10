@@ -45,6 +45,8 @@ class BaseToken(ABC):
     def generate_message(
         self,
         generator: "BaseGenerator",
+        value: Any,
+        context: dict,
     ) -> str:
         """Generate message."""
 
@@ -93,6 +95,7 @@ class BaseGenerator(ABC):
     def generate(
         self,
         template: str,
+        context: Optional[dict] = None,
     ) -> str:
         """Generate message from template."""
 
@@ -100,5 +103,6 @@ class BaseGenerator(ABC):
     def generate_from_tokens(
         self,
         tokens: List["BaseToken"],
+        context: dict,
     ) -> str:
         """Generate message from tokens."""

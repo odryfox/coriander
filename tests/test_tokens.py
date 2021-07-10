@@ -200,12 +200,20 @@ def test_default_tokenizer():
 
 
 def test_generate_any_token():
-    message = AnyToken().generate_message(generator=DefaultGenerator())
+    message = AnyToken().generate_message(
+        generator=DefaultGenerator(),
+        value=None,
+        context={},
+    )
     assert message
 
 
 def test_generate_char_token():
-    message = CharToken(char="h").generate_message(generator=DefaultGenerator())
+    message = CharToken(char="h").generate_message(
+        generator=DefaultGenerator(),
+        value=None,
+        context={},
+    )
     assert message == "h"
 
 
@@ -214,7 +222,9 @@ def test_generate_optional_token_true(choice_mock):
     choice_mock.return_value = True
 
     message = OptionalToken(tokens=[CharToken("h")]).generate_message(
-        generator=DefaultGenerator()
+        generator=DefaultGenerator(),
+        value=None,
+        context={},
     )
 
     assert message == "h"
@@ -226,7 +236,9 @@ def test_generate_optional_token_false(choice_mock):
     choice_mock.return_value = False
 
     message = OptionalToken(tokens=[CharToken("h")]).generate_message(
-        generator=DefaultGenerator()
+        generator=DefaultGenerator(),
+        value=None,
+        context={},
     )
 
     assert message == ""
@@ -404,7 +416,9 @@ def test_choice_token_generation(choice_mock):
     choice_mock.return_value = choices[1]
 
     message = ChoiceToken(choices=choices).generate_message(
-        generator=DefaultGenerator()
+        generator=DefaultGenerator(),
+        value=None,
+        context={},
     )
 
     assert message == "hi"
@@ -415,7 +429,9 @@ def test_choice_token_generation_empty():
     choices = []
 
     message = ChoiceToken(choices=choices).generate_message(
-        generator=DefaultGenerator()
+        generator=DefaultGenerator(),
+        value=None,
+        context={},
     )
 
     assert message == ""

@@ -39,7 +39,12 @@ class AnyToken(BaseToken):
     def generate_message(
         self,
         generator: BaseGenerator,
+        value: Any,
+        context: dict,
     ) -> str:
+        if value:
+            return value
+
         n = random.randint(1, 10)
         alphabet = string.ascii_uppercase + string.digits
         return "".join(random.choice(alphabet) for _ in range(n))
@@ -80,6 +85,8 @@ class CharToken(BaseToken):
     def generate_message(
         self,
         generator: BaseGenerator,
+        value: Any,
+        context: dict,
     ) -> str:
         return self.char
 
@@ -125,13 +132,23 @@ class OptionalToken(BaseToken):
     def generate_message(
         self,
         generator: BaseGenerator,
+        value: Any,
+        context: dict,
     ) -> str:
         message = ""
 
-        if random.choice([True, False]):
-            message = generator.generate_from_tokens(
-                tokens=self.tokens,
-            )
+        if value is not None:
+            if value:
+                message = generator.generate_from_tokens(
+                    tokens=self.tokens,
+                    context=context,
+                )
+        else:
+            if random.choice([True, False]):
+                message = generator.generate_from_tokens(
+                    tokens=self.tokens,
+                    context=context,
+                )
 
         return message
 
@@ -206,12 +223,17 @@ class ChoiceToken(BaseToken):
     def generate_message(
         self,
         generator: BaseGenerator,
+        value: Any,
+        context: dict,
     ) -> str:
+        if value:
+            return value
+
         if not self.choices:
             return ""
 
         choice = random.choice(self.choices)
-        message = generator.generate_from_tokens(tokens=choice)
+        message = generator.generate_from_tokens(tokens=choice, context=context)
         return message
 
 
