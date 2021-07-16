@@ -10,6 +10,8 @@ from coriander.tokens import (
     CharTokenFinder,
     ChoiceToken,
     ChoiceTokenFinder,
+    IntToken,
+    IntTokenFinder,
     OptionalToken,
     OptionalTokenFinder,
 )
@@ -468,6 +470,86 @@ class TestChoiceTokenFinder:
 
         find_token_in_template_result = token_in_template_finder.find_in_template(
             template="[hello|hi",
+            tokenizer=tokenizer,
+        )
+
+        assert not find_token_in_template_result
+
+
+class TestIntToken:
+    def test_repr(self):
+        token = IntToken()
+
+        assert repr(token) == "IntToken()"
+
+    def test_match_with_message(self):
+        token = IntToken()
+
+        match_token_with_message_results = token.match_with_message(
+            message="123ae",
+            matcher=Matcher(tokenizer=DefaultTokenizer()),
+        )
+
+        assert match_token_with_message_results[0].end == 3
+        assert match_token_with_message_results[0].value == 123
+        assert match_token_with_message_results[0].context == {}
+
+    def test_match_with_message__without_number(self):
+        token = IntToken()
+
+        match_token_with_message_results = token.match_with_message(
+            message="ae",
+            matcher=Matcher(tokenizer=DefaultTokenizer()),
+        )
+
+        assert not match_token_with_message_results
+
+    def test_generate_message(self):
+        token = IntToken()
+
+        message = token.generate_message(
+            generator=DefaultGenerator(),
+            value=123,
+            context={},
+        )
+
+        assert message == "123"
+
+    @mock.patch("random.randint")
+    def test_generate_message__without_value(self, randint_mock):
+        randint_mock.return_value = 123
+        token = IntToken()
+
+        message = token.generate_message(
+            generator=DefaultGenerator(),
+            value=None,
+            context={},
+        )
+
+        assert message == "123"
+        randint_mock.assert_called_once_with(0, 100)
+
+
+class TestIntTokenFinder:
+    def test_find_in_template(self):
+        tokenizer = DefaultTokenizer()
+        token_in_template_finder = IntTokenFinder()
+
+        find_token_in_template_result = token_in_template_finder.find_in_template(
+            template="INT abc",
+            tokenizer=tokenizer,
+        )
+
+        assert find_token_in_template_result
+        assert find_token_in_template_result.token == IntToken()
+        assert find_token_in_template_result.end == 3
+
+    def test_find_in_template__without_token(self):
+        tokenizer = DefaultTokenizer()
+        token_in_template_finder = IntTokenFinder()
+
+        find_token_in_template_result = token_in_template_finder.find_in_template(
+            template="abc INT abc",
             tokenizer=tokenizer,
         )
 

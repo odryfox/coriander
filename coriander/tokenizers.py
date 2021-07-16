@@ -6,6 +6,7 @@ from coriander.tokens import (
     AnyTokenFinder,
     CharTokenFinder,
     ChoiceTokenFinder,
+    IntTokenFinder,
     OptionalTokenFinder,
 )
 
@@ -62,6 +63,7 @@ class DefaultTokenizer(Tokenizer):
             AnyTokenFinder(),
             OptionalTokenFinder(),
             ChoiceTokenFinder(),
+            IntTokenFinder(),
             CharTokenFinder(),
         ]
 

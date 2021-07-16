@@ -278,3 +278,59 @@ class ChoiceTokenFinder(BaseTokenFinder):
                 depth += 1
 
         return None
+
+
+class IntToken(BaseToken):
+    ALPHABET = set(map(str, range(10)))
+
+    def __repr__(self) -> str:
+        return "IntToken()"
+
+    def __eq__(self, other: Any) -> bool:
+        return isinstance(other, self.__class__)
+
+    def match_with_message(
+        self,
+        message: str,
+        matcher: "BaseMatcher",
+    ) -> List[MatchTokenWithMessageResult]:
+        number_chars = []
+        for c in message:
+            if c in self.ALPHABET:
+                number_chars.append(c)
+            else:
+                break
+
+        if not number_chars:
+            return []
+
+        number = "".join(number_chars)
+        return [
+            MatchTokenWithMessageResult(
+                end=len(number),
+                value=int(number),
+                context={},
+            ),
+        ]
+
+    def generate_message(
+        self,
+        generator: "BaseGenerator",
+        value: Any,
+        context: dict,
+    ) -> str:
+        if value is not None:
+            return str(value)
+        return str(random.randint(0, 100))
+
+
+class IntTokenFinder(BaseTokenFinder):
+    def find_in_template(
+        self, template: str, tokenizer: "BaseTokenizer"
+    ) -> Optional[FindTokenInTemplateResult]:
+        if template.startswith("INT"):
+            return FindTokenInTemplateResult(
+                token=IntToken(),
+                end=3,
+            )
+        return None

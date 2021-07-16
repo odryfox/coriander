@@ -52,6 +52,15 @@ class TestGenerator:
 
         assert message == "galangal hello"
 
+    def test_generate__int_token_with_associate_name(self):
+        tokenizer = DefaultTokenizer()
+        generator = Generator(tokenizer=tokenizer)
+        template = "INT~age years old"
+
+        message = generator.generate(template=template, context={"age": 25})
+
+        assert message == "25 years old"
+
 
 class TestDefaultGenerator:
     def test_generate(self):
