@@ -171,6 +171,32 @@ class TestOptionalToken:
         assert message == ""
         choice_mock.assert_called_once_with([True, False])
 
+    @mock.patch("random.choice")
+    def test_generate_message__value_true(self, choice_mock):
+        token = OptionalToken(tokens=[CharToken("h")])
+
+        message = token.generate_message(
+            generator=DefaultGenerator(),
+            value=True,
+            context={},
+        )
+
+        assert message == "h"
+        choice_mock.assert_not_called()
+
+    @mock.patch("random.choice")
+    def test_generate_message__value_false(self, choice_mock):
+        token = OptionalToken(tokens=[CharToken("h")])
+
+        message = token.generate_message(
+            generator=DefaultGenerator(),
+            value=False,
+            context={},
+        )
+
+        assert message == ""
+        choice_mock.assert_not_called()
+
 
 class TestOptionalTokenFinder:
     def test_find_in_template(self):
