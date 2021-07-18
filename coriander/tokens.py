@@ -121,9 +121,10 @@ class OptionalToken(BaseToken):
             message=message,
             tokens=self.tokens,
         )
-        return [MatchTokenWithMessageResult(end=0)] + [
+        return [MatchTokenWithMessageResult(end=0, value=False, context={})] + [
             MatchTokenWithMessageResult(
                 end=r.end,
+                value=True,
                 context=r.context,
             )
             for r in match_tokens_with_message_results

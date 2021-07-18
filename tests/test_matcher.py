@@ -215,6 +215,19 @@ class TestMatcher:
         assert result.success
         assert result.context["age"] == 25
 
+    def test_match__optional_with_associate_name(self):
+        tokenizer = DefaultTokenizer()
+        matcher = Matcher(tokenizer=tokenizer)
+
+        result = matcher.match(
+            message="25 years old",
+            template="(INT)~is_age years old",
+        )
+
+        assert result
+        assert result.success
+        assert result.context["is_age"] is True
+
 
 class TestDefaultMatcher:
     def test_match(self):
