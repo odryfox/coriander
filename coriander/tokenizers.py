@@ -1,5 +1,5 @@
 import string
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 from coriander.core import BaseToken, BaseTokenFinder, BaseTokenizer
 from coriander.tokens import (
@@ -58,13 +58,20 @@ class Tokenizer(BaseTokenizer):
 
 
 class DefaultTokenizer(Tokenizer):
-    def __init__(self) -> None:
-        token_finders = [
+    def __init__(
+        self,
+        custom_token_finders: Optional[List[BaseTokenFinder]] = None,
+    ) -> None:
+        if not custom_token_finders:
+            custom_token_finders = []
+
+        default_token_finders = [
             AnyTokenFinder(),
             OptionalTokenFinder(),
             ChoiceTokenFinder(),
             IntTokenFinder(),
             CharTokenFinder(),
         ]
+        token_finders = custom_token_finders + default_token_finders
 
         super().__init__(token_finders=token_finders)

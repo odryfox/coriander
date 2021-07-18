@@ -1,5 +1,9 @@
+from typing import Optional
+
+from coriander.core import BaseTokenFinder, BaseTokenizer, FindTokenInTemplateResult
 from coriander.generation import DefaultGenerator, Generator
 from coriander.tokenizers import DefaultTokenizer
+from coriander.tokens import AnyToken
 
 
 class TestGenerator:
@@ -72,5 +76,30 @@ class TestDefaultGenerator:
         assert message[0] == "h"
         assert message[1] == "e"
         assert message[-1] == "o"
+
+        assert len(message) > 3
+
+    def test_generate__with_custom_token_finders(self):
+        class AllTokenFinder(BaseTokenFinder):
+            def find_in_template(
+                self,
+                template: str,
+                tokenizer: "BaseTokenizer",
+            ) -> Optional[FindTokenInTemplateResult]:
+                return FindTokenInTemplateResult(
+                    end=len(template),
+                    token=AnyToken(),
+                )
+
+        custom_token_finders = [AllTokenFinder()]
+
+        generator = DefaultGenerator(custom_token_finders=custom_token_finders)
+        template = "he*o"
+
+        message = generator.generate(template=template)
+
+        assert message[0] != "h"
+        assert message[1] != "e"
+        assert message[-1] != "o"
 
         assert len(message) > 3

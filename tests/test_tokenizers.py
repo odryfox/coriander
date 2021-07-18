@@ -1,3 +1,6 @@
+from typing import Optional
+
+from coriander.core import BaseTokenFinder, BaseTokenizer, FindTokenInTemplateResult
 from coriander.tokenizers import DefaultTokenizer, Tokenizer
 from coriander.tokens import (
     AnyToken,
@@ -96,5 +99,27 @@ class TestDefaultTokenizer:
             CharToken(char="l"),
             CharToken(char="l"),
             CharToken(char="o"),
+        ]
+        assert actual_tokens == expected_tokens
+
+    def test_tokenize__with_custom_token_finders(self):
+        class AllTokenFinder(BaseTokenFinder):
+            def find_in_template(
+                self,
+                template: str,
+                tokenizer: "BaseTokenizer",
+            ) -> Optional[FindTokenInTemplateResult]:
+                return FindTokenInTemplateResult(
+                    end=len(template),
+                    token=AnyToken(),
+                )
+
+        custom_token_finders = [AllTokenFinder()]
+        tokenizer = DefaultTokenizer(custom_token_finders=custom_token_finders)
+
+        actual_tokens = tokenizer.tokenize(template="hello")
+
+        expected_tokens = [
+            AnyToken(),
         ]
         assert actual_tokens == expected_tokens

@@ -1,8 +1,9 @@
-from typing import List
+from typing import List, Optional
 
 from coriander.core import (
     BaseMatcher,
     BaseToken,
+    BaseTokenFinder,
     BaseTokenizer,
     MatchResult,
     MatchTokensWithMessageResult,
@@ -88,8 +89,11 @@ class Matcher(BaseMatcher):
 
 
 class DefaultMatcher(Matcher):
-    def __init__(self) -> None:
-        tokenizer = DefaultTokenizer()
+    def __init__(
+        self,
+        custom_token_finders: Optional[List[BaseTokenFinder]] = None,
+    ) -> None:
+        tokenizer = DefaultTokenizer(custom_token_finders=custom_token_finders)
         super(DefaultMatcher, self).__init__(
             tokenizer=tokenizer,
         )

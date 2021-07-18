@@ -1,5 +1,7 @@
+from typing import Optional
 from unittest import mock
 
+from coriander.core import BaseTokenFinder, BaseTokenizer, FindTokenInTemplateResult
 from coriander.matching import DefaultMatcher, Matcher
 from coriander.tokenizers import DefaultTokenizer
 from coriander.tokens import AnyToken, CharToken
@@ -252,4 +254,29 @@ class TestDefaultMatcher:
 
         assert not result
         assert not result.success
+        assert result.context == {}
+
+    def test_match__with_custom_token_finders(self):
+        class AllTokenFinder(BaseTokenFinder):
+            def find_in_template(
+                self,
+                template: str,
+                tokenizer: "BaseTokenizer",
+            ) -> Optional[FindTokenInTemplateResult]:
+                return FindTokenInTemplateResult(
+                    end=len(template),
+                    token=AnyToken(),
+                )
+
+        custom_token_finders = [AllTokenFinder()]
+
+        matcher = DefaultMatcher(custom_token_finders=custom_token_finders)
+
+        result = matcher.match(
+            message="hallo my name is Docker",
+            template="[hello|hi] my name is *",
+        )
+
+        assert result
+        assert result.success
         assert result.context == {}

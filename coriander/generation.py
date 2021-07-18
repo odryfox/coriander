@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from coriander.core import BaseGenerator, BaseToken, BaseTokenizer
+from coriander.core import BaseGenerator, BaseToken, BaseTokenFinder, BaseTokenizer
 from coriander.tokenizers import DefaultTokenizer
 
 
@@ -40,6 +40,9 @@ class Generator(BaseGenerator):
 
 
 class DefaultGenerator(Generator):
-    def __init__(self):
-        tokenizer = DefaultTokenizer()
+    def __init__(
+        self,
+        custom_token_finders: Optional[List[BaseTokenFinder]] = None,
+    ):
+        tokenizer = DefaultTokenizer(custom_token_finders=custom_token_finders)
         super().__init__(tokenizer=tokenizer)
