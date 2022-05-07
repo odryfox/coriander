@@ -15,7 +15,7 @@ from coriander.core import (
 
 class AnyToken(BaseToken):
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}()"
+        return f'{self.__class__.__name__}()'
 
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__)
@@ -47,7 +47,7 @@ class AnyToken(BaseToken):
 
         n = random.randint(1, 10)
         alphabet = string.ascii_uppercase + string.digits
-        return "".join(random.choice(alphabet) for _ in range(n))
+        return ''.join(random.choice(alphabet) for _ in range(n))
 
 
 class AnyTokenFinder(BaseTokenFinder):
@@ -57,7 +57,7 @@ class AnyTokenFinder(BaseTokenFinder):
         template: str,
         tokenizer: BaseTokenizer,
     ) -> Optional[FindTokenInTemplateResult]:
-        if template[0] == "*":
+        if template[0] == '*':
             token = AnyToken()
             return FindTokenInTemplateResult(token=token, end=1)
         return None
@@ -68,7 +68,7 @@ class CharToken(BaseToken):
         self.char = char
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(char={repr(self.char)})"
+        return f'{self.__class__.__name__}(char={repr(self.char)})'
 
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__) and other.char == self.char
@@ -107,7 +107,7 @@ class OptionalToken(BaseToken):
         self.tokens = tokens
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(tokens={repr(self.tokens)})"
+        return f'{self.__class__.__name__}(tokens={repr(self.tokens)})'
 
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__) and other.tokens == self.tokens
@@ -136,7 +136,7 @@ class OptionalToken(BaseToken):
         value: Any,
         context: dict,
     ) -> str:
-        message = ""
+        message = ''
 
         if value is not None:
             if value:
@@ -155,8 +155,8 @@ class OptionalToken(BaseToken):
 
 
 class OptionalTokenFinder(BaseTokenFinder):
-    CHAR_START = "("
-    CHAR_FINISH = ")"
+    CHAR_START = '('
+    CHAR_FINISH = ')'
 
     @classmethod
     def find_in_template(
@@ -191,7 +191,7 @@ class ChoiceToken(BaseToken):
         self.choices = choices
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(choices={repr(self.choices)})"
+        return f'{self.__class__.__name__}(choices={repr(self.choices)})'
 
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__) and other.choices == self.choices
@@ -231,7 +231,7 @@ class ChoiceToken(BaseToken):
             return value
 
         if not self.choices:
-            return ""
+            return ''
 
         choice = random.choice(self.choices)
         message = generator.generate_from_tokens(tokens=choice, context=context)
@@ -239,9 +239,9 @@ class ChoiceToken(BaseToken):
 
 
 class ChoiceTokenFinder(BaseTokenFinder):
-    CHAR_START = "["
-    CHAR_FINISH = "]"
-    CHAR_SEPARATOR = "|"
+    CHAR_START = '['
+    CHAR_FINISH = ']'
+    CHAR_SEPARATOR = '|'
 
     @classmethod
     def find_in_template(
@@ -285,7 +285,7 @@ class IntToken(BaseToken):
     ALPHABET = set(map(str, range(10)))
 
     def __repr__(self) -> str:
-        return "IntToken()"
+        return 'IntToken()'
 
     def __eq__(self, other: Any) -> bool:
         return isinstance(other, self.__class__)
@@ -293,7 +293,7 @@ class IntToken(BaseToken):
     def match_with_message(
         self,
         message: str,
-        matcher: "BaseMatcher",
+        matcher: 'BaseMatcher',
     ) -> List[MatchTokenWithMessageResult]:
         number_chars = []
         for c in message:
@@ -305,7 +305,7 @@ class IntToken(BaseToken):
         if not number_chars:
             return []
 
-        number = "".join(number_chars)
+        number = ''.join(number_chars)
         return [
             MatchTokenWithMessageResult(
                 end=len(number),
@@ -316,7 +316,7 @@ class IntToken(BaseToken):
 
     def generate_message(
         self,
-        generator: "BaseGenerator",
+        generator: 'BaseGenerator',
         value: Any,
         context: dict,
     ) -> str:
@@ -327,9 +327,9 @@ class IntToken(BaseToken):
 
 class IntTokenFinder(BaseTokenFinder):
     def find_in_template(
-        self, template: str, tokenizer: "BaseTokenizer"
+        self, template: str, tokenizer: 'BaseTokenizer'
     ) -> Optional[FindTokenInTemplateResult]:
-        if template.startswith("INT"):
+        if template.startswith('INT'):
             return FindTokenInTemplateResult(
                 token=IntToken(),
                 end=3,

@@ -1,39 +1,45 @@
-<p>A simple library for intent classification and named-entity recognition using templates.</p>
+# Coriander
+
+A simple library for intent classification and named-entity recognition using templates.
+
+
+## Matching
 
 ```python
-# matching
 from coriander.matching import DefaultMatcher
 
 DefaultMatcher().match(
-    template="[hello|hi] my name is *",
-    message="hello my name is Coriander",
+    template='[hello|hi] my name is *',
+    message='hello my name is Coriander',
 ).success
 # True
 
 DefaultMatcher().match(
-    template="[hello|hi] my name is *",
-    message="hi my name is Millet",
+    template='[hello|hi] my name is *',
+    message='hi my name is Millet',
 ).success
 # True
 
 DefaultMatcher().match(
-    template="[hello|hi] my name is *",
-    message="hallo my name is Galangal",
+    template='[hello|hi] my name is *',
+    message='hallo my name is Galangal',
 ).success
 # False
 
 DefaultMatcher().match(
-    template="[hello|hi]~greeting my name is *~name",
-    message="hello my name is Galangal",
+    template='[hello|hi]~greeting my name is *~name',
+    message='hello my name is Galangal',
 ).context
 # {'greeting': 'hello', 'name': 'Galangal'}
+```
 
+## Generation
 
-# generation
+```python
 from coriander.generation import DefaultGenerator
 
 DefaultGenerator().generate(
-    template="[hello|hi]~greeting my name is *~name",
+    template='[hello|hi]~greeting my name is *~name',
     context={'greeting': 'hello', 'name': 'Galangal'},
 )
 # 'hello my name is Galangal'

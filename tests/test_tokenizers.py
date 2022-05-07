@@ -21,16 +21,16 @@ class TestTokenizer:
             token_finders=token_finders,
         )
 
-        actual_tokens = tokenizer.tokenize(template="* hello")
+        actual_tokens = tokenizer.tokenize(template='* hello')
 
         expected_tokens = [
             AnyToken(),
-            CharToken(char=" "),
-            CharToken(char="h"),
-            CharToken(char="e"),
-            CharToken(char="l"),
-            CharToken(char="l"),
-            CharToken(char="o"),
+            CharToken(char=' '),
+            CharToken(char='h'),
+            CharToken(char='e'),
+            CharToken(char='l'),
+            CharToken(char='l'),
+            CharToken(char='o'),
         ]
         assert actual_tokens == expected_tokens
 
@@ -44,11 +44,11 @@ class TestTokenizer:
         )
 
         tokens = tokenizer.tokenize(
-            template="[Docker|Coriander]~name",
+            template='[Docker|Coriander]~name',
         )
 
         assert tokens
-        assert tokens[0].associate_name == "name"
+        assert tokens[0].associate_name == 'name'
 
     def test_tokenize__associate_name_with_underscore(self):
         token_finders = [
@@ -60,11 +60,11 @@ class TestTokenizer:
         )
 
         tokens = tokenizer.tokenize(
-            template="[Docker|Coriander]~first_name",
+            template='[Docker|Coriander]~first_name',
         )
 
         assert tokens
-        assert tokens[0].associate_name == "first_name"
+        assert tokens[0].associate_name == 'first_name'
 
     def test_tokenize__associate_names(self):
         token_finders = [
@@ -76,29 +76,29 @@ class TestTokenizer:
         )
 
         tokens = tokenizer.tokenize(
-            template="[Docker|Coriander]~name [12|21]~age",
+            template='[Docker|Coriander]~name [12|21]~age',
         )
 
         assert tokens
-        assert tokens[0].associate_name == "name"
+        assert tokens[0].associate_name == 'name'
         assert tokens[1].associate_name is None  # space char
-        assert tokens[2].associate_name == "age"
+        assert tokens[2].associate_name == 'age'
 
 
 class TestDefaultTokenizer:
     def test_tokenize(self):
         tokenizer = DefaultTokenizer()
 
-        actual_tokens = tokenizer.tokenize(template="* hello")
+        actual_tokens = tokenizer.tokenize(template='* hello')
 
         expected_tokens = [
             AnyToken(),
-            CharToken(char=" "),
-            CharToken(char="h"),
-            CharToken(char="e"),
-            CharToken(char="l"),
-            CharToken(char="l"),
-            CharToken(char="o"),
+            CharToken(char=' '),
+            CharToken(char='h'),
+            CharToken(char='e'),
+            CharToken(char='l'),
+            CharToken(char='l'),
+            CharToken(char='o'),
         ]
         assert actual_tokens == expected_tokens
 
@@ -107,7 +107,7 @@ class TestDefaultTokenizer:
             def find_in_template(
                 self,
                 template: str,
-                tokenizer: "BaseTokenizer",
+                tokenizer: 'BaseTokenizer',
             ) -> Optional[FindTokenInTemplateResult]:
                 return FindTokenInTemplateResult(
                     end=len(template),
@@ -117,7 +117,7 @@ class TestDefaultTokenizer:
         custom_token_finders = [AllTokenFinder()]
         tokenizer = DefaultTokenizer(custom_token_finders=custom_token_finders)
 
-        actual_tokens = tokenizer.tokenize(template="hello")
+        actual_tokens = tokenizer.tokenize(template='hello')
 
         expected_tokens = [
             AnyToken(),

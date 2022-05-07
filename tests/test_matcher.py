@@ -10,17 +10,17 @@ from coriander.tokens import AnyToken, CharToken
 class TestMatcher:
     def test_match_with_tokens(self):
         tokens = [
-            CharToken(char="h"),
-            CharToken(char="e"),
+            CharToken(char='h'),
+            CharToken(char='e'),
             AnyToken(),
-            CharToken(char="o"),
+            CharToken(char='o'),
         ]
         tokenizer = mock.Mock()
         matcher = Matcher(tokenizer=tokenizer)
 
         match_tokens_with_message_results = matcher.match_with_tokens(
             tokens=tokens,
-            message="hello",
+            message='hello',
         )
 
         assert match_tokens_with_message_results[0].end == 5
@@ -28,34 +28,34 @@ class TestMatcher:
 
     def test_match_with_tokens__incorrect(self):
         tokens = [
-            CharToken(char="h"),
-            CharToken(char="e"),
+            CharToken(char='h'),
+            CharToken(char='e'),
             AnyToken(),
-            CharToken(char="a"),
+            CharToken(char='a'),
         ]
         tokenizer = mock.Mock()
         matcher = Matcher(tokenizer=tokenizer)
 
         match_tokens_with_message_results = matcher.match_with_tokens(
             tokens=tokens,
-            message="hello",
+            message='hello',
         )
 
         assert match_tokens_with_message_results == []
 
     def test_match_with_tokens__empty_message(self):
         tokens = [
-            CharToken(char="h"),
-            CharToken(char="e"),
+            CharToken(char='h'),
+            CharToken(char='e'),
             AnyToken(),
-            CharToken(char="o"),
+            CharToken(char='o'),
         ]
         tokenizer = mock.Mock()
         matcher = Matcher(tokenizer=tokenizer)
 
         match_tokens_with_message_results = matcher.match_with_tokens(
             tokens=tokens,
-            message="",
+            message='',
         )
 
         assert match_tokens_with_message_results == []
@@ -67,7 +67,7 @@ class TestMatcher:
 
         match_tokens_with_message_results = matcher.match_with_tokens(
             tokens=tokens,
-            message="",
+            message='',
         )
 
         assert match_tokens_with_message_results[0].end == 0
@@ -80,7 +80,7 @@ class TestMatcher:
 
         match_tokens_with_message_results = matcher.match_with_tokens(
             tokens=tokens,
-            message="hello",
+            message='hello',
         )
 
         assert match_tokens_with_message_results[0].end == 0
@@ -89,14 +89,14 @@ class TestMatcher:
     def test_match_with_tokens__few_variants(self):
         tokens = [
             AnyToken(),
-            CharToken(char="e"),
+            CharToken(char='e'),
         ]
         tokenizer = mock.Mock()
         matcher = Matcher(tokenizer=tokenizer)
 
         match_tokens_with_message_results = matcher.match_with_tokens(
             tokens=tokens,
-            message="hee",
+            message='hee',
         )
 
         assert match_tokens_with_message_results[0].end == 2
@@ -113,7 +113,7 @@ class TestMatcher:
 
         match_tokens_with_message_results = matcher.match_with_tokens(
             tokens=tokens,
-            message="hee",
+            message='hee',
         )
 
         assert match_tokens_with_message_results[0].end == 1
@@ -128,107 +128,107 @@ class TestMatcher:
         matcher = Matcher(tokenizer=tokenizer)
 
         result = matcher.match(
-            message="hello",
-            template="[hello|hi]~greeting",
+            message='hello',
+            template='[hello|hi]~greeting',
         )
 
         assert result
         assert result.success
-        assert result.context["greeting"] == "hello"
+        assert result.context['greeting'] == 'hello'
 
     def test_match__associate_name_second_variant(self):
         tokenizer = DefaultTokenizer()
         matcher = Matcher(tokenizer=tokenizer)
 
         result = matcher.match(
-            message="hi",
-            template="[hello|hi]~greeting",
+            message='hi',
+            template='[hello|hi]~greeting',
         )
 
         assert result
         assert result.success
-        assert result.context["greeting"] == "hi"
+        assert result.context['greeting'] == 'hi'
 
     def test_match__associate_name_nested(self):
         tokenizer = DefaultTokenizer()
         matcher = Matcher(tokenizer=tokenizer)
 
         result = matcher.match(
-            message="millet",
-            template="[[galangal|millet]~name|hi]~greeting",
+            message='millet',
+            template='[[galangal|millet]~name|hi]~greeting',
         )
 
         assert result
         assert result.success
-        assert result.context["greeting"] == "millet"
-        assert result.context["name"] == "millet"
+        assert result.context['greeting'] == 'millet'
+        assert result.context['name'] == 'millet'
 
     def test_match__associate_name_nested_second(self):
         tokenizer = DefaultTokenizer()
         matcher = Matcher(tokenizer=tokenizer)
 
         result = matcher.match(
-            message="hi",
-            template="[[galangal|millet]~name|hi]~greeting",
+            message='hi',
+            template='[[galangal|millet]~name|hi]~greeting',
         )
 
         assert result
         assert result.success
-        assert result.context["greeting"] == "hi"
-        assert "name" not in result.context
+        assert result.context['greeting'] == 'hi'
+        assert 'name' not in result.context
 
     def test_match__associate_name_few(self):
         tokenizer = DefaultTokenizer()
         matcher = Matcher(tokenizer=tokenizer)
 
         result = matcher.match(
-            message="millet hello",
-            template="[galangal|millet]~name [hello|hi]~greeting",
+            message='millet hello',
+            template='[galangal|millet]~name [hello|hi]~greeting',
         )
 
         assert result
         assert result.success
-        assert result.context["name"] == "millet"
-        assert result.context["greeting"] == "hello"
+        assert result.context['name'] == 'millet'
+        assert result.context['greeting'] == 'hello'
 
     def test_match__associate_name_any(self):
         tokenizer = DefaultTokenizer()
         matcher = Matcher(tokenizer=tokenizer)
 
         result = matcher.match(
-            message="millet hello",
-            template="*~name hello",
+            message='millet hello',
+            template='*~name hello',
         )
 
         assert result
         assert result.success
-        assert result.context["name"] == "millet"
+        assert result.context['name'] == 'millet'
 
     def test_match__int_token_with_associate_name(self):
         tokenizer = DefaultTokenizer()
         matcher = Matcher(tokenizer=tokenizer)
 
         result = matcher.match(
-            message="25 years old",
-            template="INT~age years old",
+            message='25 years old',
+            template='INT~age years old',
         )
 
         assert result
         assert result.success
-        assert result.context["age"] == 25
+        assert result.context['age'] == 25
 
     def test_match__optional_with_associate_name(self):
         tokenizer = DefaultTokenizer()
         matcher = Matcher(tokenizer=tokenizer)
 
         result = matcher.match(
-            message="25 years old",
-            template="(INT)~is_age years old",
+            message='25 years old',
+            template='(INT)~is_age years old',
         )
 
         assert result
         assert result.success
-        assert result.context["is_age"] is True
+        assert result.context['is_age'] is True
 
 
 class TestDefaultMatcher:
@@ -236,8 +236,8 @@ class TestDefaultMatcher:
         matcher = DefaultMatcher()
 
         result = matcher.match(
-            message="hello my name is Docker",
-            template="[hello|hi] my name is *",
+            message='hello my name is Docker',
+            template='[hello|hi] my name is *',
         )
 
         assert result
@@ -248,8 +248,8 @@ class TestDefaultMatcher:
         matcher = DefaultMatcher()
 
         result = matcher.match(
-            message="hallo my name is Docker",
-            template="[hello|hi] my name is *",
+            message='hallo my name is Docker',
+            template='[hello|hi] my name is *',
         )
 
         assert not result
@@ -261,7 +261,7 @@ class TestDefaultMatcher:
             def find_in_template(
                 self,
                 template: str,
-                tokenizer: "BaseTokenizer",
+                tokenizer: 'BaseTokenizer',
             ) -> Optional[FindTokenInTemplateResult]:
                 return FindTokenInTemplateResult(
                     end=len(template),
@@ -273,8 +273,8 @@ class TestDefaultMatcher:
         matcher = DefaultMatcher(custom_token_finders=custom_token_finders)
 
         result = matcher.match(
-            message="hallo my name is Docker",
-            template="[hello|hi] my name is *",
+            message='hallo my name is Docker',
+            template='[hello|hi] my name is *',
         )
 
         assert result

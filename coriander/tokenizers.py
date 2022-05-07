@@ -12,8 +12,8 @@ from coriander.tokens import (
 
 
 class Tokenizer(BaseTokenizer):
-    ASSOCIATE_NAME_CHAR = "~"
-    ASSOCIATE_NAME_ALPHABET = set(string.ascii_letters) | {"_"}
+    ASSOCIATE_NAME_CHAR = '~'
+    ASSOCIATE_NAME_ALPHABET = set(string.ascii_letters) | {'_'}
 
     def __init__(
         self,
@@ -49,7 +49,7 @@ class Tokenizer(BaseTokenizer):
                         else:
                             associate_name = template[1:]
                             token.associate_name = associate_name
-                            template = ""
+                            template = ''
 
                     tokens.append(token)
                     break

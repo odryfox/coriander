@@ -3,7 +3,7 @@ from typing import Any, List, Optional
 
 
 class FindTokenInTemplateResult:
-    def __init__(self, token: "BaseToken", end: int) -> None:
+    def __init__(self, token: 'BaseToken', end: int) -> None:
         self.token = token
         self.end = end
 
@@ -13,7 +13,7 @@ class BaseTokenFinder(ABC):
     def find_in_template(
         self,
         template: str,
-        tokenizer: "BaseTokenizer",
+        tokenizer: 'BaseTokenizer',
     ) -> Optional[FindTokenInTemplateResult]:
         """Find token in start of template."""
 
@@ -37,14 +37,14 @@ class BaseToken(ABC):
     def match_with_message(
         self,
         message: str,
-        matcher: "BaseMatcher",
+        matcher: 'BaseMatcher',
     ) -> List[MatchTokenWithMessageResult]:
         """Match token with start of message. Return variants ending of token."""
 
     @abstractmethod
     def generate_message(
         self,
-        generator: "BaseGenerator",
+        generator: 'BaseGenerator',
         value: Any,
         context: dict,
     ) -> str:
@@ -85,7 +85,7 @@ class BaseMatcher(ABC):
     def match_with_tokens(
         self,
         message: str,
-        tokens: List["BaseToken"],
+        tokens: List['BaseToken'],
     ) -> List[MatchTokensWithMessageResult]:
         """Match tokens with start of message. Return variants ending of tokens."""
 
@@ -102,7 +102,7 @@ class BaseGenerator(ABC):
     @abstractmethod
     def generate_from_tokens(
         self,
-        tokens: List["BaseToken"],
+        tokens: List['BaseToken'],
         context: dict,
     ) -> str:
         """Generate message from tokens."""

@@ -19,7 +19,7 @@ class Generator(BaseGenerator):
 
     def generate_from_tokens(
         self,
-        tokens: List["BaseToken"],
+        tokens: List['BaseToken'],
         context: dict,
     ) -> str:
         message_parts = []
@@ -36,7 +36,7 @@ class Generator(BaseGenerator):
             )
             message_parts.append(message_part)
 
-        return "".join(message_parts)
+        return ''.join(message_parts)
 
 
 class DefaultGenerator(Generator):

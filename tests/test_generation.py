@@ -10,72 +10,72 @@ class TestGenerator:
     def test_generate(self):
         tokenizer = DefaultTokenizer()
         generator = Generator(tokenizer=tokenizer)
-        template = "he*o"
+        template = 'he*o'
 
         message = generator.generate(template=template)
 
-        assert message[0] == "h"
-        assert message[1] == "e"
-        assert message[-1] == "o"
+        assert message[0] == 'h'
+        assert message[1] == 'e'
+        assert message[-1] == 'o'
 
         assert len(message) > 3
 
     def test_generate__associate_name(self):
         tokenizer = DefaultTokenizer()
         generator = Generator(tokenizer=tokenizer)
-        template = "*~name hello"
+        template = '*~name hello'
 
-        message = generator.generate(template=template, context={"name": "coriander"})
+        message = generator.generate(template=template, context={'name': 'coriander'})
 
-        assert message == "coriander hello"
+        assert message == 'coriander hello'
 
     def test_generate__optional_with_associate_name_true(self):
         tokenizer = DefaultTokenizer()
         generator = Generator(tokenizer=tokenizer)
-        template = "(coriander)~name hello"
+        template = '(coriander)~name hello'
 
-        message = generator.generate(template=template, context={"name": True})
+        message = generator.generate(template=template, context={'name': True})
 
-        assert message == "coriander hello"
+        assert message == 'coriander hello'
 
     def test_generate__optional_with_associate_name_false(self):
         tokenizer = DefaultTokenizer()
         generator = Generator(tokenizer=tokenizer)
-        template = "(coriander)~name hello"
+        template = '(coriander)~name hello'
 
-        message = generator.generate(template=template, context={"name": False})
+        message = generator.generate(template=template, context={'name': False})
 
-        assert message == " hello"
+        assert message == ' hello'
 
     def test_generate__choice_with_associate_name_false(self):
         tokenizer = DefaultTokenizer()
         generator = Generator(tokenizer=tokenizer)
-        template = "[coriander|galangal]~name hello"
+        template = '[coriander|galangal]~name hello'
 
-        message = generator.generate(template=template, context={"name": "galangal"})
+        message = generator.generate(template=template, context={'name': 'galangal'})
 
-        assert message == "galangal hello"
+        assert message == 'galangal hello'
 
     def test_generate__int_token_with_associate_name(self):
         tokenizer = DefaultTokenizer()
         generator = Generator(tokenizer=tokenizer)
-        template = "INT~age years old"
+        template = 'INT~age years old'
 
-        message = generator.generate(template=template, context={"age": 25})
+        message = generator.generate(template=template, context={'age': 25})
 
-        assert message == "25 years old"
+        assert message == '25 years old'
 
 
 class TestDefaultGenerator:
     def test_generate(self):
         generator = DefaultGenerator()
-        template = "he*o"
+        template = 'he*o'
 
         message = generator.generate(template=template)
 
-        assert message[0] == "h"
-        assert message[1] == "e"
-        assert message[-1] == "o"
+        assert message[0] == 'h'
+        assert message[1] == 'e'
+        assert message[-1] == 'o'
 
         assert len(message) > 3
 
@@ -84,7 +84,7 @@ class TestDefaultGenerator:
             def find_in_template(
                 self,
                 template: str,
-                tokenizer: "BaseTokenizer",
+                tokenizer: 'BaseTokenizer',
             ) -> Optional[FindTokenInTemplateResult]:
                 return FindTokenInTemplateResult(
                     end=len(template),
@@ -94,12 +94,12 @@ class TestDefaultGenerator:
         custom_token_finders = [AllTokenFinder()]
 
         generator = DefaultGenerator(custom_token_finders=custom_token_finders)
-        template = "he*o"
+        template = 'he*o'
 
         message = generator.generate(template=template)
 
-        assert message[0] != "h"
-        assert message[1] != "e"
-        assert message[-1] != "o"
+        assert message[0] != 'h'
+        assert message[1] != 'e'
+        assert message[-1] != 'o'
 
         assert len(message) > 3
