@@ -87,7 +87,7 @@ class TestDefaultGenerator:
                 tokenizer: 'BaseTokenizer',
             ) -> Optional[FindTokenInTemplateResult]:
                 return FindTokenInTemplateResult(
-                    end=len(template),
+                    end=1,
                     token=AnyToken(),
                 )
 
